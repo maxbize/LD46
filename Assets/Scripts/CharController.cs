@@ -95,6 +95,16 @@ public class CharController : MonoBehaviour
             force += acceleration * moveDir;
         }
 
+        // Handle jump state transitions
+        if (jumpTime > noAirFrictionTime && jumping == JumpState.WallJumpLocked) {
+            jumpStartTime = 0;
+            jumping = JumpState.WallJumpFree;
+        }
+        if (grounded && jumping == JumpState.WallJumpFree) {
+            jumpStartTime = 0;
+            jumping = JumpState.None;
+        }
+
         // Jump handling
         // 1. On ground, not jumping, want to jump, start new jump
         // 2. Continuing an existing jump
@@ -117,16 +127,7 @@ public class CharController : MonoBehaviour
             } else if (Time.timeSinceLevelLoad - jumpStartTime < jumpSustainTime) {
                 force += Vector2.up * jumpSustainForce;
             }
-        } else if (jumping != JumpState.None) {
-            jumpStartTime = 0;
-            jumping = JumpState.None;
-        }
-
-        if (jumpTime > noAirFrictionTime && jumping == JumpState.WallJumpLocked) {
-            jumpStartTime = 0;
-            jumping = JumpState.WallJumpFree;
-        }
-        if (grounded && jumping == JumpState.WallJumpFree) {
+        } else if (jumping != JumpState.None && jumping != JumpState.WallJumpLocked) {
             jumpStartTime = 0;
             jumping = JumpState.None;
         }
@@ -236,13 +237,17 @@ public class CharController : MonoBehaviour
     // -1 left wall, 0 not walled, 1 right wall
     private int IsWalled() {
         int layerMask = 1 << LayerMask.NameToLayer("Environment");
-        RaycastHit2D hit = Physics2D.Raycast(col.bounds.center, Vector2.right, (col.bounds.extents.x + 1 / 16f), layerMask);
-
-        Debug.DrawRay(col.bounds.center, Vector2.right * (col.bounds.extents.x + 1 / 16f), hit.collider == null ? Color.red : Color.green);
-        if (hit.collider == null) {
-            return 0;
+        RaycastHit2D rightHit = Physics2D.Raycast(col.bounds.center, Vector2.right, (col.bounds.extents.x + 1 / 16f), layerMask);
+        if (rightHit.collider != null) {
+            return 1;
         }
-        return hit.point.x > col.bounds.center.x ? 1 : -1;
+
+        RaycastHit2D leftHit = Physics2D.Raycast(col.bounds.center, Vector2.left, (col.bounds.extents.x + 1 / 16f), layerMask);
+        if (leftHit.collider != null) {
+            return -1;
+        }
+
+        return 0;
     }
 
     private bool IsGrounded() {
