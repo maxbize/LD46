@@ -14,10 +14,6 @@ public class HumanInput : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate() {
 
-        charController.Move(Vector2.right * Input.GetAxisRaw("Horizontal"));
-
-        if (Input.GetKey(KeyCode.Space)) {
-            charController.Jump();
-        }
+        charController.Move(Vector2.right * Input.GetAxisRaw("Horizontal"), Input.GetKey(KeyCode.Space));
     }
 }

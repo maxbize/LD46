@@ -10,7 +10,10 @@ public class CharController : MonoBehaviour
     public float horizontalDrag;
     public float noMoveDrag;
     public float verticalDrag;
-    public float jumpSpeed;
+    public float jumpForce;
+    public float jumpSustainForce;
+    public float jumpSustainTime;
+    public float frictionCoefficient;
 
     public AnimationCurve horizontalGroundVelocityRampUp;
     public AnimationCurve horizontalGroundVelocityRampDown;
@@ -34,8 +37,10 @@ public class CharController : MonoBehaviour
     private Rigidbody2D rb;
     private Collider2D col;
     private SpriteRenderer sr;
-    private bool jumpFlag;
+    private bool jumpInput;
     private Vector2 moveDir;
+    private bool jumping;
+    private float jumpStartTime;
 
     // Start is called before the first frame update
     void Start() {
@@ -50,14 +55,14 @@ public class CharController : MonoBehaviour
     }
 
     private void FixedUpdate() {
-        FindCurves();
+        //FindCurves();
 
         Vector2 force = Vector2.zero;
         bool grounded = IsGrounded();
 
         // Gravity
-        float gravity = 9.8f * gravityScale;
-        force += Vector2.down * gravity;
+        //float gravity = 9.8f * gravityScale;
+        //force += Vector2.down * gravity;
 
         // Drag
         //float hDrag = rb.velocity.x * rb.velocity.x * moveDir.magnitude > 0.1 ? horizontalDrag : noMoveDrag;
@@ -67,11 +72,39 @@ public class CharController : MonoBehaviour
         // Input movement
         force += acceleration * moveDir;
 
+        // Jump handling
+        // 1. On ground, not jumping, want to jump, start new jump
+        // 2. Continuing an existing jump
+        // 3. No longer jumping
+        if (jumpInput) {
+            if (grounded && jumpStartTime == 0) {
+                jumping = true;
+                rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+                jumpStartTime = Time.timeSinceLevelLoad;
+            } else if (Time.timeSinceLevelLoad - jumpStartTime < jumpSustainTime) {
+                force += Vector2.up * jumpSustainForce;
+            }
+        } else if (jumping) {
+            jumpStartTime = 0;
+        }
 
+        // Friction
+        if (grounded && moveDir.x == 0) {
+            force -= Vector2.right * rb.velocity.x * frictionCoefficient;
+        }
 
         // Apply forces
-        //rb.AddForce(force);
+        rb.AddForce(force);
 
+        if (Mathf.Abs(rb.velocity.x) > 0.1f) {
+            sr.flipX = rb.velocity.x < 0;
+        }
+
+        //if (Mathf.Abs(rb.velocity.x) < 0.5 && moveDir.x == 0) {
+        //    rb.velocity = Vector2.up * rb.velocity.y; // Clear x velocity
+        //} 
+
+        /*
         // Horizontal velocity curve
         Vector2 velocity = rb.velocity;
         float horizontalCurveTime = Time.timeSinceLevelLoad - horizontalCurveStartTime;
@@ -90,6 +123,7 @@ public class CharController : MonoBehaviour
         }
 
         rb.velocity = velocity;
+        */
     }
 
     // Figure out which curve we're on
@@ -113,13 +147,13 @@ public class CharController : MonoBehaviour
         candidateCurve = null;
 
         if (grounded) {
-            if (jumpFlag) {
+            if (jumpInput) {
                 candidateCurve = jumpVelocityRamp;
             } else {
                 candidateCurve = verticalGroundedVelocityRamp;
             }
         } else {
-            if (!(currentVerticalCurve == jumpVelocityRamp && jumpFlag)) {
+            if (!(currentVerticalCurve == jumpVelocityRamp && jumpInput)) {
                 candidateCurve = verticalFreefallVelocityRamp;
             }
         }
@@ -138,11 +172,8 @@ public class CharController : MonoBehaviour
         return hit.collider != null;
     }
 
-    public void Move(Vector2 dir) {
+    public void Move(Vector2 dir, bool jump) {
         moveDir = dir;
-    }
-
-    public void Jump() {
-        jumpFlag = true;
+        jumpInput = jump;
     }
 }
