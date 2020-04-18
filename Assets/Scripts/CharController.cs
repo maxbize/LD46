@@ -23,6 +23,7 @@ public class CharController : MonoBehaviour
     public float wallJumpYForce;
     public float wallJumpMoveRestrictTime;
     public float noAirFrictionTime;
+    public float wallStickTime;
 
     public AnimationCurve horizontalGroundVelocityRampUp;
     public AnimationCurve horizontalGroundVelocityRampDown;
@@ -50,6 +51,7 @@ public class CharController : MonoBehaviour
     private Vector2 moveDir;
     private JumpState jumping;
     private float jumpStartTime;
+    private float wallStickStartTime;
     private bool newJumpInput = true;
 
     private enum JumpState
@@ -72,6 +74,8 @@ public class CharController : MonoBehaviour
 
     }
 
+    // This is an absolute mess. If I had more time, I'd want to simplify as much as possible.
+    // Maybe just a single moveState powering a state machine and a single stateStart timer
     private void FixedUpdate() {
         //FindCurves();
 
@@ -90,6 +94,8 @@ public class CharController : MonoBehaviour
 
         // Input movement
         if (jumping == JumpState.WallJumpLocked && jumpTime < noAirFrictionTime) {
+
+        } else if (!grounded && Time.timeSinceLevelLoad - wallStickStartTime < wallStickTime) {
 
         } else {
             force += acceleration * moveDir;
@@ -147,6 +153,7 @@ public class CharController : MonoBehaviour
 
         // Limit y velocity
         if (walled != 0 && moveDir.x != 0 && Mathf.Sign(walled) == Mathf.Sign(moveDir.x) && -rb.velocity.y > maxYVelWalled && rb.velocity.y < 0) {
+            wallStickStartTime = Time.timeSinceLevelLoad;
             rb.velocity = new Vector2(rb.velocity.x, -maxYVelWalled);
         } else if (rb.velocity.y < 0 && -rb.velocity.y > maxYVel) {
             rb.velocity = new Vector2(rb.velocity.x, -maxYVel);

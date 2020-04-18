@@ -2395,5 +2395,10 @@ PrefabInstance:
       propertyPath: maxXVelAirWallJump
       value: 15
       objectReference: {fileID: 0}
+    - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
+        type: 3}
+      propertyPath: wallStickTime
+      value: 0.15
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 470191cb3bdb3e640a81935cd0a2e3e4, type: 3}
