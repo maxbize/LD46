@@ -237,13 +237,21 @@ public class CharController : MonoBehaviour
     // -1 left wall, 0 not walled, 1 right wall
     private int IsWalled() {
         int layerMask = 1 << LayerMask.NameToLayer("Environment");
-        RaycastHit2D rightHit = Physics2D.Raycast(col.bounds.center, Vector2.right, (col.bounds.extents.x + 1 / 16f), layerMask);
-        if (rightHit.collider != null) {
+        RaycastHit2D hit = Physics2D.Raycast((Vector2)col.bounds.center - Vector2.up * col.bounds.extents.y * 0.9f, Vector2.right, (col.bounds.extents.x + 1 / 16f), layerMask);
+        if (hit.collider != null) {
+            return 1;
+        }
+        hit = Physics2D.Raycast((Vector2)col.bounds.center + Vector2.up * col.bounds.extents.y * 0.9f, Vector2.right, (col.bounds.extents.x + 1 / 16f), layerMask);
+        if (hit.collider != null) {
             return 1;
         }
 
-        RaycastHit2D leftHit = Physics2D.Raycast(col.bounds.center, Vector2.left, (col.bounds.extents.x + 1 / 16f), layerMask);
-        if (leftHit.collider != null) {
+        hit = Physics2D.Raycast((Vector2)col.bounds.center - Vector2.up * col.bounds.extents.y * 0.9f, Vector2.left, (col.bounds.extents.x + 1 / 16f), layerMask);
+        if (hit.collider != null) {
+            return -1;
+        }
+        hit = Physics2D.Raycast((Vector2)col.bounds.center + Vector2.up * col.bounds.extents.y * 0.9f, Vector2.left, (col.bounds.extents.x + 1 / 16f), layerMask);
+        if (hit.collider != null) {
             return -1;
         }
 
