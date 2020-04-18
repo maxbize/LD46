@@ -1464,7 +1464,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 881380707, guid: 470191cb3bdb3e640a81935cd0a2e3e4, type: 3}
       propertyPath: m_GravityScale
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 881380707, guid: 470191cb3bdb3e640a81935cd0a2e3e4, type: 3}
       propertyPath: m_CollisionDetection
@@ -1837,12 +1837,47 @@ PrefabInstance:
     - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
         type: 3}
       propertyPath: jumpSustainTime
-      value: 0.75
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
         type: 3}
       propertyPath: jumpSustainForce
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
+        type: 3}
+      propertyPath: maxYVel
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
+        type: 3}
+      propertyPath: maxYVelWalled
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
+        type: 3}
+      propertyPath: maxXVelGround
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
+        type: 3}
+      propertyPath: maxXVelAir
       value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
+        type: 3}
+      propertyPath: wallJumpXForce
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
+        type: 3}
+      propertyPath: wallJumpYForce
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
+        type: 3}
+      propertyPath: noAirFrictionTime
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 3674948573971586815, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
         type: 3}

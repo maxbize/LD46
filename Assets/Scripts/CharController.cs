@@ -14,6 +14,15 @@ public class CharController : MonoBehaviour
     public float jumpSustainForce;
     public float jumpSustainTime;
     public float frictionCoefficient;
+    public float maxYVel;
+    public float maxYVelWalled;
+    public float maxXVelGround;
+    public float maxXVelAir;
+    public float maxXVelAirWallJump;
+    public float wallJumpXForce;
+    public float wallJumpYForce;
+    public float wallJumpMoveRestrictTime;
+    public float noAirFrictionTime;
 
     public AnimationCurve horizontalGroundVelocityRampUp;
     public AnimationCurve horizontalGroundVelocityRampDown;
@@ -39,8 +48,17 @@ public class CharController : MonoBehaviour
     private SpriteRenderer sr;
     private bool jumpInput;
     private Vector2 moveDir;
-    private bool jumping;
+    private JumpState jumping;
     private float jumpStartTime;
+    private bool newJumpInput = true;
+
+    private enum JumpState
+    {
+        None,
+        Ground,
+        WallJumpLocked,
+        WallJumpFree
+    }
 
     // Start is called before the first frame update
     void Start() {
@@ -51,7 +69,7 @@ public class CharController : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
-    
+
     }
 
     private void FixedUpdate() {
@@ -59,46 +77,95 @@ public class CharController : MonoBehaviour
 
         Vector2 force = Vector2.zero;
         bool grounded = IsGrounded();
+        int walled = IsWalled();
+        float jumpTime = Time.timeSinceLevelLoad - jumpStartTime;
 
         // Gravity
         //float gravity = 9.8f * gravityScale;
         //force += Vector2.down * gravity;
 
         // Drag
-        //float hDrag = rb.velocity.x * rb.velocity.x * moveDir.magnitude > 0.1 ? horizontalDrag : noMoveDrag;
-        float hDrag = rb.velocity.x * rb.velocity.x * horizontalDrag;
-        force += Vector2.left * Mathf.Sign(rb.velocity.x) * hDrag;
+        //float hDrag = rb.velocity.x * rb.velocity.x * horizontalDrag;
+        //force += Vector2.left * Mathf.Sign(rb.velocity.x) * hDrag;
 
         // Input movement
-        force += acceleration * moveDir;
+        if (jumping == JumpState.WallJumpLocked && jumpTime < noAirFrictionTime) {
+
+        } else {
+            force += acceleration * moveDir;
+        }
 
         // Jump handling
         // 1. On ground, not jumping, want to jump, start new jump
         // 2. Continuing an existing jump
         // 3. No longer jumping
         if (jumpInput) {
-            if (grounded && jumpStartTime == 0) {
-                jumping = true;
+            if (grounded && jumpStartTime == 0 && newJumpInput) {
+                // Check ground jump
+                jumping = JumpState.Ground;
+                jumpTime = 0;
                 rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+                jumpStartTime = Time.timeSinceLevelLoad;
+            } else if (walled != 0 && !grounded && jumpStartTime == 0 && newJumpInput) {
+                // Check wall jump
+                jumping = JumpState.WallJumpLocked;
+                jumpTime = 0;
+                rb.velocity = Vector2.zero;
+                rb.AddForce(Vector2.up * wallJumpYForce, ForceMode2D.Impulse);
+                rb.AddForce(Vector2.left * walled * wallJumpXForce, ForceMode2D.Impulse);
                 jumpStartTime = Time.timeSinceLevelLoad;
             } else if (Time.timeSinceLevelLoad - jumpStartTime < jumpSustainTime) {
                 force += Vector2.up * jumpSustainForce;
             }
-        } else if (jumping) {
+        } else if (jumping != JumpState.None) {
             jumpStartTime = 0;
+            jumping = JumpState.None;
+        }
+
+        if (jumpTime > noAirFrictionTime && jumping == JumpState.WallJumpLocked) {
+            jumpStartTime = 0;
+            jumping = JumpState.WallJumpFree;
+        }
+        if (grounded && jumping == JumpState.WallJumpFree) {
+            jumpStartTime = 0;
+            jumping = JumpState.None;
         }
 
         // Friction
-        if (grounded && moveDir.x == 0) {
+        if (moveDir.x == 0 && (grounded || Time.timeSinceLevelLoad - jumpStartTime > noAirFrictionTime)) {
             force -= Vector2.right * rb.velocity.x * frictionCoefficient;
         }
 
         // Apply forces
         rb.AddForce(force);
 
+        // Handle sprite direction
         if (Mathf.Abs(rb.velocity.x) > 0.1f) {
             sr.flipX = rb.velocity.x < 0;
         }
+
+        // Limit y velocity
+        if (walled != 0 && moveDir.x != 0 && Mathf.Sign(walled) == Mathf.Sign(moveDir.x) && -rb.velocity.y > maxYVelWalled && rb.velocity.y < 0) {
+            rb.velocity = new Vector2(rb.velocity.x, -maxYVelWalled);
+        } else if (rb.velocity.y < 0 && -rb.velocity.y > maxYVel) {
+            rb.velocity = new Vector2(rb.velocity.x, -maxYVel);
+        }
+
+        // Limit x velocity
+        if (jumping == JumpState.WallJumpLocked && Mathf.Abs(rb.velocity.x) > maxXVelAirWallJump) {
+            rb.velocity = new Vector2(maxXVelAirWallJump * Mathf.Sign(rb.velocity.x), rb.velocity.y);
+        } else if (jumping == JumpState.WallJumpFree && Mathf.Abs(rb.velocity.x) > maxXVelAir) {
+            rb.velocity = new Vector2(maxXVelAir * Mathf.Sign(rb.velocity.x), rb.velocity.y);
+        } else if ((jumping == JumpState.Ground || jumping == JumpState.None) && Mathf.Abs(rb.velocity.x) > maxXVelGround) {
+            rb.velocity = new Vector2(maxXVelGround * Mathf.Sign(rb.velocity.x), rb.velocity.y);
+        }
+        /*
+        if (grounded && Mathf.Abs(rb.velocity.x) > maxXVelGround) {
+            rb.velocity = new Vector2(maxXVelGround * Mathf.Sign(rb.velocity.x), rb.velocity.y);
+        } else if (!grounded && Mathf.Abs(rb.velocity.x) > maxXVelAir) {
+            rb.velocity = new Vector2(maxXVelAir * Mathf.Sign(rb.velocity.x), rb.velocity.y);
+        }
+        */
 
         //if (Mathf.Abs(rb.velocity.x) < 0.5 && moveDir.x == 0) {
         //    rb.velocity = Vector2.up * rb.velocity.y; // Clear x velocity
@@ -127,6 +194,7 @@ public class CharController : MonoBehaviour
     }
 
     // Figure out which curve we're on
+    /*
     private void FindCurves() {
         AnimationCurve candidateCurve = null;
         bool grounded = IsGrounded();
@@ -163,17 +231,31 @@ public class CharController : MonoBehaviour
             verticalCurveStartTime = Time.timeSinceLevelLoad;
         }
     }
+    */
+
+    // -1 left wall, 0 not walled, 1 right wall
+    private int IsWalled() {
+        int layerMask = 1 << LayerMask.NameToLayer("Environment");
+        RaycastHit2D hit = Physics2D.Raycast(col.bounds.center, Vector2.right, (col.bounds.extents.x + 1 / 16f), layerMask);
+
+        Debug.DrawRay(col.bounds.center, Vector2.right * (col.bounds.extents.x + 1 / 16f), hit.collider == null ? Color.red : Color.green);
+        if (hit.collider == null) {
+            return 0;
+        }
+        return hit.point.x > col.bounds.center.x ? 1 : -1;
+    }
 
     private bool IsGrounded() {
         int layerMask = 1 << LayerMask.NameToLayer("Environment");
         RaycastHit2D hit = Physics2D.Raycast(col.bounds.center, Vector2.down, (col.bounds.extents.y + 1 / 16f), layerMask);
 
-        Debug.DrawRay(col.bounds.center, Vector2.down * (col.bounds.extents.y + 1/16f), hit.collider == null ? Color.red : Color.green);
+        //Debug.DrawRay(col.bounds.center, Vector2.down * (col.bounds.extents.y + 1/16f), hit.collider == null ? Color.red : Color.green);
         return hit.collider != null;
     }
 
-    public void Move(Vector2 dir, bool jump) {
+    public void Move(Vector2 dir, bool jump, bool jumpDown) {
         moveDir = dir;
         jumpInput = jump;
+        newJumpInput = jumpDown;
     }
 }
