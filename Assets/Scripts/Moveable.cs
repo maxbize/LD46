@@ -20,7 +20,7 @@ public class Moveable : MonoBehaviour
     // Defining here to be the same for all moveables
     private const float INITIAL_LERP_SPEED = 2f;
     private const float PATROL_START_TIME = 1f;
-    private const float PATROL_END_TIME = 1f;
+    private const float PATROL_END_TIME = 2f;
     private const float PATROL_TO_SPEED = 40f;
     private const float PATROL_FROM_LERP_SPEED = 1f;
     private const float PLAYER_TO_LERP_SPEED = 30f;
