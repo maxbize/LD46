@@ -40,6 +40,7 @@ public class LevelManager : MonoBehaviour
     void Update() {
 
         if (startMenu.activeSelf) {
+            heart.GetComponent<SpriteRenderer>().sortingLayerName = "Foreground";
             if (Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.X)) {
                 startMenu.SetActive(false);
                 heart.GetComponent<SpriteRenderer>().sortingLayerName = "Background";
