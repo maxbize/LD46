@@ -47,6 +47,10 @@ public class Moveable : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
+        if (config == null) {
+            return;
+        }
+
         // Initial Movement
         if (state == State.MoveToInitialTarget) {
             Vector3 toTarget = (Vector3)config.GetTarget(0) - transform.position;

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour
 {
@@ -13,25 +14,48 @@ public class LevelManager : MonoBehaviour
     public Moveable brain;
     public Transform player;
     public int hitsPerLevel;
+    public GameObject heart;
+    public GameObject startMenu;
+    public GameObject endMenu;
+    public Text endMenuBody1;
+    public Text endMenuBody2;
 
     private List<Moveable> parts;
     private Moveable nextPart; // Next part player needs to touch to advance Player level sequence
     private int hitsLeft;
+    private float gameStartTime;
 
     // Start is called before the first frame update
     void Start() {
         parts = new List<Moveable>() { leftHand, rightHand, brain };
-        StartLevel(currentLevel);
+        endMenu.SetActive(false);
+
+        // Debug mode - start at a specific level
+        if (!startMenu.activeSelf) {
+            StartLevel(currentLevel);
+        }
     }
 
     // Update is called once per frame
     void Update() {
 
-        // Hack!
-        if (player.position.y < 0.1f) {
-            parts.ForEach(p => p.NotifyPlayerTouchedGround());
-            nextPart = rightHand;
+        if (startMenu.activeSelf) {
+            if (Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.X)) {
+                startMenu.SetActive(false);
+                heart.GetComponent<SpriteRenderer>().sortingLayerName = "Background";
+                gameStartTime = Time.timeSinceLevelLoad;
+                StartLevel(currentLevel);
+            }
+        } else if (endMenu.activeSelf) {
+            heart.transform.position = new Vector2(1, 9.5f);
+        } else {
+            // Hack!
+            if (player.position.y < 0.1f) {
+                parts.ForEach(p => p.NotifyPlayerTouchedGround());
+                nextPart = rightHand;
+            }
         }
+
     }
 
     private void StartLevel(int index) {
@@ -80,9 +104,20 @@ public class LevelManager : MonoBehaviour
                 currentLevel++;
                 if (currentLevel < levels.childCount) {
                     StartLevel(currentLevel);
+                } else {
+                    ActivateEndState();
                 }
             }
         }
+    }
+
+    private void ActivateEndState() {
+        endMenu.SetActive(true);
+        heart.GetComponent<SpriteRenderer>().sortingLayerName = "Foreground";
+        string time = (Time.timeSinceLevelLoad - gameStartTime).ToString("F1");
+        string s = "thanks for playing!\ntime: " + time + " sec\nmade in 48 hours for LD46\n\"keep it alive\"\n@maxbize";
+        endMenuBody1.text = s;
+        endMenuBody2.text = s;
     }
 
 }

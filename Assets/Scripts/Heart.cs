@@ -13,11 +13,14 @@ public class Heart : MonoBehaviour
     public PostProcessing pp;
 
     private List<LineRenderer> lineRenderers = new List<LineRenderer>();
+    private Vector2 targetPos;
+    private float perlinSeed;
 
     private float lastPulseTime;
 
     // Start is called before the first frame update
     void Start() {
+        targetPos = transform.position;
         for (int i = 0; i < linkStarts.Count; i++) {
             GameObject childLink = new GameObject("Heart link " + i);
             LineRenderer lr = childLink.AddComponent<LineRenderer>();
@@ -43,5 +46,11 @@ public class Heart : MonoBehaviour
             lastPulseTime = Time.timeSinceLevelLoad;
             pp.SendPulse(transform.position); // heh heh :P
         }
+
+        float noiseX = Mathf.PerlinNoise(perlinSeed + Time.timeSinceLevelLoad, 0) - 0.5f;
+        float noiseY = Mathf.PerlinNoise(0, perlinSeed + Time.timeSinceLevelLoad) - 0.5f;
+        noiseX = Mathf.Round(noiseX * 4) / 4;
+        noiseY = Mathf.Round(noiseY * 4) / 4;
+        transform.position = targetPos + new Vector2(noiseX, noiseY) * 0.5f;
     }
 }
