@@ -30,8 +30,10 @@ public class LevelManager : MonoBehaviour
         parts = new List<Moveable>() { leftHand, rightHand, brain };
         endMenu.SetActive(false);
 
-        // Debug mode - start at a specific level
-        if (!startMenu.activeSelf) {
+        if (startMenu.activeSelf) {
+            
+        } else {
+            // Debug mode - start at a specific level
             StartLevel(currentLevel);
         }
     }

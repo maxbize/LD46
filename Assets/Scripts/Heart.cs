@@ -13,59 +13,59 @@ public class Heart : MonoBehaviour
     public PostProcessing pp;
     public GameObject startMenu;
     public GameObject endMenu;
+    public ParticleSystem heartParticles;
     public float springCoeffient;
 
     private List<LineRenderer> lineRenderers = new List<LineRenderer>();
     private Vector2 targetPos;
     private float perlinSeed;
-    private List<float> catAs; // catenary 'a' values
-    private List<float> catLowest; // 0-1 normalized distance of lowest point along rope
+    private List<Vector2> bezierOffsets = new List<Vector2>();
     private SpriteRenderer playerSr;
 
     private float lastPulseTime;
 
     // Start is called before the first frame update
     void Start() {
+        heartParticles.Stop();
         playerSr = player.GetComponent<SpriteRenderer>();
         targetPos = transform.position;
         for (int i = 0; i < linkStarts.Count; i++) {
             GameObject childLink = new GameObject("Heart link " + i);
             LineRenderer lr = childLink.AddComponent<LineRenderer>();
             lineRenderers.Add(lr);
-            lr.startWidth = 1.5f / 16f;
-            lr.endWidth = 0.5f / 16f;
+            lr.startWidth = 2f / 16f;
+            lr.endWidth = 1f / 16f;
             lr.sharedMaterial = mat;
             lr.sortingLayerName = "Background";
             lr.startColor = new Color32(36, 34, 47, 255);
-            lr.endColor = new Color32(36, 34, 47, 255);
-            catAs.Add(Random.Range(0.5f, 2f));
+            lr.endColor = new Color32(143, 248, 226, 255);
+            lr.positionCount = 3;
+            bezierOffsets.Add(Random.onUnitSphere);
         }
     }
 
     // Update is called once per frame
     void Update() {
-        float xDist = Mathf.Abs(player.position.x - transform.position.x);
+        Vector2 toPlayer = player.position - transform.position;
+        // If there's time later, do something cool like bezier or catenary
         for (int i = 0; i < linkStarts.Count; i++) {
             LineRenderer lr = lineRenderers[i];
-            lr.SetPosition(0, (Vector2)transform.position + linkStarts[i]);
-            float lowestX = xDist * catLowest[i];
-            float a = catAs[i];
-            for (int j = 0; j < segmentsPerLine; j++) {
-                // Catenary equation: a * cosh ( x / a )
-                // x is the lowest point on the line
-                float x = (j + 1) * xDist / (segmentsPerLine + 1);
-                float y = a * (float)System.Math.Cosh(x / a);
-                lr.SetPosition(j + 1, new Vector2());
-
-            }
-            lr.SetPosition(1, (Vector2)player.position + linkEnds[i]);
+            Vector2 p0 = (Vector2)transform.position + linkStarts[i];
+            Vector2 p1 = (Vector2)transform.position + toPlayer/2 + bezierOffsets[i];
+            Vector2 p2 = (Vector2)player.position + linkEnds[i];
+            lr.SetPosition(0, p0);
+            lr.SetPosition(1, p1);
+            lr.SetPosition(2, p2);
         }
 
         if (!startMenu.activeSelf && !endMenu.activeSelf) {
-            Vector3 offset = new Vector3(playerSr.flipX ? 2.5f : -2.5f, 1.5f);
-            Vector2 toPlayer = player.position - transform.position + offset;
-            targetPos += toPlayer * springCoeffient * Time.deltaTime;
-
+            Vector2 offset = new Vector2(playerSr.flipX ? 2.5f : -2.5f, 1.5f);
+            Vector2 toPlayerOffset = toPlayer + offset;
+            targetPos += toPlayerOffset * springCoeffient * Time.deltaTime;
+        } else {
+            transform.position = new Vector2(1, 9.5f);
+            targetPos = new Vector2(1, 9.5f);
+            heartParticles.Stop();
         }
 
         if (Time.timeSinceLevelLoad - lastPulseTime > 1.5f) {

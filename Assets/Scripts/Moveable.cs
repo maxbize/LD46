@@ -7,7 +7,8 @@ public class Moveable : MonoBehaviour
     // Set in editor
     public LevelManager levelManager;
     public Transform player;
-    public bool hover; // Move around a little so that the scene is not so static
+    public Transform heart;
+    public ParticleSystem heartParticles;
 
     public MoveConfig config { get; set; }
     public bool atTarget { get; set; }
@@ -49,6 +50,10 @@ public class Moveable : MonoBehaviour
     void Update() {
         if (config == null) {
             return;
+        }
+
+        if (config.part == MoveConfig.Part.Brain) {
+            HandleHeartParticles();
         }
 
         // Initial Movement
@@ -167,5 +172,20 @@ public class Moveable : MonoBehaviour
             atTarget = true;
             levelManager.NotifyPartAtTarget(this);
         }
+
+        if (config.part == MoveConfig.Part.Brain) {
+            if (state == State.WaitingForNextConfig) {
+                heartParticles.Play();
+            } else {
+                heartParticles.Stop();
+            }
+        }
+    }
+
+    // Should really be in another class but out of time!
+    private void HandleHeartParticles() {
+        Vector2 heartToSelf = transform.position - heart.position;
+        heartParticles.transform.position = heart.position + Vector3.back * 3;
+        heartParticles.transform.rotation = Quaternion.LookRotation(heartToSelf);
     }
 }

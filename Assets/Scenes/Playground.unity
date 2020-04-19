@@ -1533,7 +1533,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelManager: {fileID: 1157716570}
   player: {fileID: 1642432875}
-  hover: 0
+  heart: {fileID: 0}
+  heartParticles: {fileID: 0}
 --- !u!1 &580217206
 GameObject:
   m_ObjectHideFlags: 0
@@ -2197,7 +2198,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelManager: {fileID: 1157716570}
   player: {fileID: 1642432875}
-  hover: 0
+  heart: {fileID: 1500120211}
+  heartParticles: {fileID: 1258595495}
 --- !u!1 &856608319
 GameObject:
   m_ObjectHideFlags: 0
@@ -2215,7 +2217,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &856608320
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5453,7 +5455,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34bdf611c77c56b45931299e97d68e0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentLevel: 0
+  currentLevel: 8
   levels: {fileID: 594102349}
   leftHand: {fileID: 1961989496}
   rightHand: {fileID: 576438352}
@@ -5626,12 +5628,12 @@ GameObject:
   - component: {fileID: 1258595495}
   - component: {fileID: 1258595494}
   m_Layer: 0
-  m_Name: Particle System
+  m_Name: Heart Particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!199 &1258595494
 ParticleSystemRenderer:
   serializedVersion: 6
@@ -5670,8 +5672,8 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 785946155
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_RenderMode: 0
   m_SortMode: 0
@@ -5769,7 +5771,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 0
+  moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -5886,7 +5888,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0.9176471, g: 0.30980393, b: 0.21176472, a: 1}
+      maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -6529,7 +6531,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 30
+      scalar: 50
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -6968,7 +6970,7 @@ ParticleSystem:
         m_RotationOrder: 4
     separateAxes: 0
   ColorModule:
-    enabled: 0
+    enabled: 1
     gradient:
       serializedVersion: 2
       minMaxState: 1
@@ -6976,8 +6978,8 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
-        key0: {r: 1, g: 1, b: 1, a: 1}
-        key1: {r: 1, g: 1, b: 1, a: 1}
+        key0: {r: 0.9176471, g: 0.30980393, b: 0.21176472, a: 1}
+        key1: {r: 0.18039216, g: 0.13333334, b: 0.18431373, a: 1}
         key2: {r: 0, g: 0, b: 0, a: 0}
         key3: {r: 0, g: 0, b: 0, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
@@ -7034,7 +7036,7 @@ ParticleSystem:
         m_NumAlphaKeys: 2
   UVModule:
     serializedVersion: 2
-    enabled: 1
+    enabled: 0
     mode: 1
     timeMode: 0
     fps: 30
@@ -7158,10 +7160,10 @@ ParticleSystem:
     flipU: 0
     flipV: 0
   VelocityModule:
-    enabled: 0
+    enabled: 1
     x:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -7214,9 +7216,9 @@ ParticleSystem:
         m_RotationOrder: 4
     y:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 0
-      minScalar: 0
+      minMaxState: 3
+      scalar: -2
+      minScalar: 2
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -7267,7 +7269,7 @@ ParticleSystem:
         m_RotationOrder: 4
     z:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -7427,7 +7429,7 @@ ParticleSystem:
     orbitalZ:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: 5
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -7742,7 +7744,7 @@ ParticleSystem:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-    inWorldSpace: 0
+    inWorldSpace: 1
   InheritVelocityModule:
     enabled: 0
     m_Mode: 0
@@ -7800,7 +7802,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
   ForceModule:
-    enabled: 0
+    enabled: 1
     x:
       serializedVersion: 2
       minMaxState: 0
@@ -10372,8 +10374,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1258595493}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.8171903, y: 6.872182, z: -2.5253906}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -3.88, y: 2.37, z: -2.53}
+  m_LocalScale: {x: 1, y: 1.0000005, z: 1.0000005}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 9
@@ -10821,8 +10823,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1500120209}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 9.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 1, y: 3.03, z: 0}
+  m_LocalScale: {x: 1, y: 1.0000002, z: 1.0000002}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 6
@@ -10840,16 +10842,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1642432875}
-  linkStarts: []
-  linkEnds: []
+  linkStarts:
+  - {x: -0.5, y: -0.25}
+  - {x: 0.2, y: -0.1}
+  - {x: 0.5, y: 0.4}
+  linkEnds:
+  - {x: 0, y: 0.5}
+  - {x: 0, y: 0.5}
+  - {x: 0, y: 0.5}
   segmentsPerLine: 0
   mat: {fileID: 2100000, guid: a6616a3cb563d1944b2a4005b7fa9139, type: 2}
   pp: {fileID: 519420033}
   startMenu: {fileID: 856608319}
   endMenu: {fileID: 340245292}
-  noSpringDist: 2.5
-  springCoeffient: 1
-  maxSpeed: 20
+  heartParticles: {fileID: 1258595495}
+  springCoeffient: 2
 --- !u!1 &1515375998
 GameObject:
   m_ObjectHideFlags: 0
@@ -12418,7 +12425,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelManager: {fileID: 1157716570}
   player: {fileID: 1642432875}
-  hover: 0
+  heart: {fileID: 0}
+  heartParticles: {fileID: 0}
 --- !u!1 &1986922617
 GameObject:
   m_ObjectHideFlags: 0
