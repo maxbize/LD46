@@ -19,6 +19,7 @@ public class LevelManager : MonoBehaviour
     public GameObject endMenu;
     public Text endMenuBody1;
     public Text endMenuBody2;
+    public Brain brainScript;
 
     private List<Moveable> parts;
     private Moveable nextPart; // Next part player needs to touch to advance Player level sequence
@@ -101,6 +102,7 @@ public class LevelManager : MonoBehaviour
 
     public void NotifyPlayerAttackedPart(Moveable part) {
         if (part == brain) {
+            brainScript.NotifyHurt();
             hitsLeft--;
             if (hitsLeft <= 0) {
                 currentLevel++;

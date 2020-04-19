@@ -2079,6 +2079,7 @@ GameObject:
   - component: {fileID: 852985676}
   - component: {fileID: 852985678}
   - component: {fileID: 852985679}
+  - component: {fileID: 852985680}
   m_Layer: 14
   m_Name: Boss Head
   m_TagString: Untagged
@@ -2200,6 +2201,28 @@ MonoBehaviour:
   player: {fileID: 1642432875}
   heart: {fileID: 1500120211}
   heartParticles: {fileID: 1258595495}
+--- !u!114 &852985680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852985675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da3d4ff488f966346896f5de90565abf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frame_Normal: {fileID: 1245321604235342870, guid: 813e5173249788b4c88e480306a9f730,
+    type: 3}
+  frame_Flash: {fileID: 254447671079547839, guid: 813e5173249788b4c88e480306a9f730,
+    type: 3}
+  frame_Hurt: {fileID: -1766911106988750569, guid: 813e5173249788b4c88e480306a9f730,
+    type: 3}
+  hurtFlashTime: 0.05
+  hurtAnimTime: 0.25
+  hurtFreezeTime: 0.1
+  heartParticles: {fileID: 1258595495}
 --- !u!1 &856608319
 GameObject:
   m_ObjectHideFlags: 0
@@ -2217,7 +2240,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &856608320
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5467,6 +5490,7 @@ MonoBehaviour:
   endMenu: {fileID: 340245292}
   endMenuBody1: {fileID: 1342279750}
   endMenuBody2: {fileID: 569548596}
+  brainScript: {fileID: 852985680}
 --- !u!4 &1157716571
 Transform:
   m_ObjectHideFlags: 0

@@ -29,6 +29,15 @@ TextureImporter:
   - first:
       213: -5331470343187050568
     second: Boss Head_2
+  - first:
+      213: 3875134514628722689
+    second: Boss Head_3
+  - first:
+      213: 2113060595366333157
+    second: Boss Head_4
+  - first:
+      213: 2763744809943590623
+    second: Boss Head_5
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -133,8 +142,8 @@ TextureImporter:
         y: 176
         width: 80
         height: 80
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -155,7 +164,7 @@ TextureImporter:
         width: 80
         height: 80
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -176,7 +185,7 @@ TextureImporter:
         width: 80
         height: 80
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -197,14 +206,56 @@ TextureImporter:
         width: 80
         height: 80
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ea87a05f6934d3440800000000000000
-      internalID: 4917160683793709230
+      spriteID: 1000d494f4e37c530800000000000000
+      internalID: 3875134514628722689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Boss Head_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 16
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5ea8faf7a69135d10800000000000000
+      internalID: 2113060595366333157
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Boss Head_5
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 16
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fd6648ef24bca5620800000000000000
+      internalID: 2763744809943590623
       vertices: []
       indices: 
       edges: []
