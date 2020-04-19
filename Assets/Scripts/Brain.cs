@@ -35,12 +35,14 @@ public class Brain : MonoBehaviour
 
         if (Time.unscaledTime - hurtStartUnscaledTime > hurtFreezeTime) {
             Time.timeScale = 1;
+        transform.localScale = Vector3.one;
         }
     }
 
     public void NotifyHurt() {
         hurtStartTime = Time.timeSinceLevelLoad;
         hurtStartUnscaledTime = Time.unscaledTime;
+        transform.localScale = Vector3.one * 0.9f;
         Time.timeScale = 0;
     }
 }

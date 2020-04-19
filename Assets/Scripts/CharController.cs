@@ -29,6 +29,8 @@ public class CharController : MonoBehaviour
     public float attackCoolTime; // Total time including animation
     public Sprite frame_Walk;
     public Sprite frame_Attack;
+    public GameObject jumpEffectPrefab;
+    public ParticleSystem wallSlideParticles;
 
     public AnimationCurve horizontalGroundVelocityRampUp;
     public AnimationCurve horizontalGroundVelocityRampDown;
@@ -146,6 +148,7 @@ public class CharController : MonoBehaviour
                 jumpTime = 0;
                 rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
                 jumpStartTime = Time.timeSinceLevelLoad;
+                Instantiate(jumpEffectPrefab, transform.position, sr.flipX ? Quaternion.Euler(180, 0, 180) : Quaternion.Euler(0, 0, 0));
             //} else if (walled != 0 && !grounded && jumpStartTime == 0 && newJumpInput) {
             } else if (walled != 0 && !grounded && newJumpInput) {
                 // Check wall jump
@@ -155,6 +158,7 @@ public class CharController : MonoBehaviour
                 rb.AddForce(Vector2.up * wallJumpYForce, ForceMode2D.Impulse);
                 rb.AddForce(Vector2.left * walled * wallJumpXForce, ForceMode2D.Impulse);
                 jumpStartTime = Time.timeSinceLevelLoad;
+                Instantiate(jumpEffectPrefab, transform.position + Vector3.right * walled * col.bounds.extents.x, sr.flipX ? Quaternion.Euler(180, 0, -90) : Quaternion.Euler(0, 0, 90));
             } else if (Time.timeSinceLevelLoad - jumpStartTime < jumpSustainTime) {
                 force += Vector2.up * jumpSustainForce;
             }
@@ -176,12 +180,21 @@ public class CharController : MonoBehaviour
             sr.flipX = rb.velocity.x < 0;
         }
 
-        // Limit y velocity
-        if (walled != 0 && moveDir.x != 0 && Mathf.Sign(walled) == Mathf.Sign(moveDir.x) && -rb.velocity.y > maxYVelWalled && rb.velocity.y < 0) {
+        // Limit y velocity + wall slide
+        if (walled != 0 && moveDir.x != 0 && Mathf.Sign(walled) == Mathf.Sign(moveDir.x) && rb.velocity.y < 0) {
+            if (-rb.velocity.y > maxYVelWalled) {
+                rb.velocity = new Vector2(rb.velocity.x, -maxYVelWalled);
+            }
             wallStickStartTime = Time.timeSinceLevelLoad;
-            rb.velocity = new Vector2(rb.velocity.x, -maxYVelWalled);
+            if (!wallSlideParticles.isPlaying) {
+                wallSlideParticles.Play();
+                wallSlideParticles.transform.localPosition = new Vector3(sr.flipX ? -0.3f : 0.2f, 0, -0.2f);
+            }
         } else if (rb.velocity.y < 0 && -rb.velocity.y > maxYVel) {
+            wallSlideParticles.Stop();
             rb.velocity = new Vector2(rb.velocity.x, -maxYVel);
+        } else {
+            wallSlideParticles.Stop();
         }
 
         // Limit x velocity
