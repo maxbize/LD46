@@ -10,8 +10,11 @@ public class Heart : MonoBehaviour
     public List<Vector2> linkEnds;
     public int segmentsPerLine;
     public Material mat;
+    public PostProcessing pp;
 
     private List<LineRenderer> lineRenderers = new List<LineRenderer>();
+
+    private float lastPulseTime;
 
     // Start is called before the first frame update
     void Start() {
@@ -34,6 +37,11 @@ public class Heart : MonoBehaviour
             LineRenderer lr = lineRenderers[i];
             lr.SetPosition(0, (Vector2)transform.position + linkStarts[i]);
             lr.SetPosition(1, (Vector2)player.position + linkEnds[i]);
+        }
+
+        if (Time.timeSinceLevelLoad - lastPulseTime > 1.5f) {
+            lastPulseTime = Time.timeSinceLevelLoad;
+            pp.SendPulse(transform.position); // heh heh :P
         }
     }
 }
