@@ -6,6 +6,7 @@ public class Moveable : MonoBehaviour
 {
     // Set in editor
     public LevelManager levelManager;
+    public Transform player;
     public bool hover; // Move around a little so that the scene is not so static
 
     public MoveConfig config { get; set; }
@@ -13,6 +14,8 @@ public class Moveable : MonoBehaviour
     private State state;
     private float stateStartTime;
     private float perlinSeed;
+    private int targetIndex; // Only used for player dynamic states for now
+    private Collider2D col;
 
     // Defining here to be the same for all moveables
     private const float INITIAL_LERP_SPEED = 2f;
@@ -20,6 +23,8 @@ public class Moveable : MonoBehaviour
     private const float PATROL_END_TIME = 1f;
     private const float PATROL_TO_SPEED = 30f;
     private const float PATROL_FROM_LERP_SPEED = 1f;
+    private const float PLAYER_TO_LERP_SPEED = 30f;
+    private const float PLAYER_TO_MIN_DIST = 3f;
 
     private enum State
     {
@@ -29,12 +34,15 @@ public class Moveable : MonoBehaviour
         PatrolStart,
         PatrolMoveTo,
         PatrolWaitEnd,
-        PatrolMoveBack
+        PatrolMoveBack,
+        PlayerMoveTo,
+        PlayerWait
     }
 
     // Start is called before the first frame update
     void Start() {
         perlinSeed = Random.Range(0f, 100f);
+        col = GetComponent<Collider2D>();
     }
 
     // Update is called once per frame
@@ -43,15 +51,17 @@ public class Moveable : MonoBehaviour
         if (state == State.MoveToInitialTarget) {
             Vector3 toTarget = (Vector3)config.GetTarget(0) - transform.position;
             transform.position += toTarget * INITIAL_LERP_SPEED * Time.deltaTime;
-            if (toTarget.magnitude < 1 / 16f) {
+            if (toTarget.magnitude < 2 / 16f) {
+                transform.position = config.GetTarget(0);
                 SwitchToState(State.WaitingToStart);
             }
 
         // Chillin'
-        } else if (state == State.WaitingForNextConfig) {
+        } else if (state == State.WaitingForNextConfig || (config.typ == MoveConfig.Type.Static && state == State.WaitingToStart)) {
             float noiseX = Mathf.PerlinNoise(perlinSeed + Time.timeSinceLevelLoad, 0) - 0.5f;
             float noiseY = Mathf.PerlinNoise(0, perlinSeed + Time.timeSinceLevelLoad) - 0.5f;
             transform.position = config.GetTarget(0) + new Vector2(noiseX, noiseY);
+
         // Patrol states (loops)
         } else if (state == State.PatrolStart) {
             atTarget = false;
@@ -82,6 +92,26 @@ public class Moveable : MonoBehaviour
         }
 
         // Player reactive states
+        else if (state == State.PlayerMoveTo) {
+            Vector3 toTarget = (Vector3)config.GetTarget(targetIndex) - transform.position;
+            Vector3 deltaPos = toTarget.normalized * PLAYER_TO_LERP_SPEED * Time.deltaTime;
+            if (deltaPos.magnitude > toTarget.magnitude) {
+                deltaPos = toTarget;
+            }
+            transform.position += deltaPos;
+            if (toTarget.magnitude < 1 / 16f) {
+                SwitchToState(State.PlayerWait);
+            } else {
+                Vector3 toPlayer = player.position - col.bounds.center;
+                if (toPlayer.magnitude < PLAYER_TO_MIN_DIST) {
+                    transform.position -= toPlayer.normalized * (PLAYER_TO_MIN_DIST - toPlayer.magnitude);
+                }
+            }
+        } else if (state == State.PlayerWait) {
+            float noiseX = Mathf.PerlinNoise(perlinSeed + Time.timeSinceLevelLoad, 0) - 0.5f;
+            float noiseY = Mathf.PerlinNoise(0, perlinSeed + Time.timeSinceLevelLoad) - 0.5f;
+            //transform.position = config.GetTarget(targetIndex) + new Vector2(noiseX, noiseY);
+        }
     }
 
     public void SetConfig(MoveConfig config) {
@@ -100,7 +130,23 @@ public class Moveable : MonoBehaviour
         } else if (config.typ == MoveConfig.Type.Patrol) {
             SwitchToState(State.PatrolStart);
         } else {
-            Debug.LogError("Player Moveable state not yet implemented");
+            SwitchToState(State.PlayerWait);
+        }
+    }
+
+    public void NotifyPlayerTouchedOtherHand() {
+        if (targetIndex < config.NumTargets() - 1) {
+            Debug.Log(name + " moving to target " + (targetIndex + 1));
+            targetIndex++;
+            SwitchToState(State.PlayerMoveTo);
+        }
+    }
+
+    public void NotifyPlayerTouchedGround() {
+        if (config.typ == MoveConfig.Type.Player && targetIndex != 0) {
+            atTarget = false;
+            targetIndex = 0;
+            SwitchToState(State.MoveToInitialTarget);
         }
     }
 

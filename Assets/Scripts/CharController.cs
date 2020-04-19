@@ -5,6 +5,7 @@ using UnityEngine;
 public class CharController : MonoBehaviour
 {
     // Set in editor
+    public LevelManager levelManager;
     public float acceleration;
     public float gravityScale;
     public float horizontalDrag;
@@ -122,7 +123,8 @@ public class CharController : MonoBehaviour
                 jumpTime = 0;
                 rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
                 jumpStartTime = Time.timeSinceLevelLoad;
-            } else if (walled != 0 && !grounded && jumpStartTime == 0 && newJumpInput) {
+            //} else if (walled != 0 && !grounded && jumpStartTime == 0 && newJumpInput) {
+            } else if (walled != 0 && !grounded && newJumpInput) {
                 // Check wall jump
                 jumping = JumpState.WallJumpLocked;
                 jumpTime = 0;
@@ -246,23 +248,35 @@ public class CharController : MonoBehaviour
         int layerMask = 1 << LayerMask.NameToLayer("Environment");
         RaycastHit2D hit = Physics2D.Raycast((Vector2)col.bounds.center - Vector2.up * col.bounds.extents.y * 0.9f, Vector2.right, (col.bounds.extents.x + 1 / 16f), layerMask);
         if (hit.collider != null) {
+            CheckHit(hit);
             return 1;
         }
         hit = Physics2D.Raycast((Vector2)col.bounds.center + Vector2.up * col.bounds.extents.y * 0.9f, Vector2.right, (col.bounds.extents.x + 1 / 16f), layerMask);
         if (hit.collider != null) {
+            CheckHit(hit);
             return 1;
         }
 
         hit = Physics2D.Raycast((Vector2)col.bounds.center - Vector2.up * col.bounds.extents.y * 0.9f, Vector2.left, (col.bounds.extents.x + 1 / 16f), layerMask);
         if (hit.collider != null) {
+            CheckHit(hit);
             return -1;
         }
         hit = Physics2D.Raycast((Vector2)col.bounds.center + Vector2.up * col.bounds.extents.y * 0.9f, Vector2.left, (col.bounds.extents.x + 1 / 16f), layerMask);
         if (hit.collider != null) {
+            CheckHit(hit);
             return -1;
         }
 
         return 0;
+    }
+
+    // Check if we need to notify level manager
+    private void CheckHit(RaycastHit2D hit) {
+        Moveable m = hit.transform.GetComponent<Moveable>();
+        if (m != null) {
+            levelManager.NotifyPlayerTouchedPart(m);
+        }
     }
 
     private bool IsGrounded() {
@@ -270,6 +284,9 @@ public class CharController : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(col.bounds.center, Vector2.down, (col.bounds.extents.y + 1 / 16f), layerMask);
 
         //Debug.DrawRay(col.bounds.center, Vector2.down * (col.bounds.extents.y + 1/16f), hit.collider == null ? Color.red : Color.green);
+        if (hit.collider != null) {
+            CheckHit(hit);
+        }
         return hit.collider != null;
     }
 

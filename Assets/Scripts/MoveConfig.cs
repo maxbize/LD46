@@ -42,4 +42,8 @@ public class MoveConfig : MonoBehaviour
     public Vector2 GetTarget(int index) {
         return targets[index];
     }
+
+    public int NumTargets() {
+        return targets.Count;
+    }
 }
