@@ -30,10 +30,12 @@ public class MoveConfig : MonoBehaviour
             targets.Add(transform.GetChild(i).transform.position);
         }
 
-        if (transform.childCount == 0 && typ == Type.Static) {
-            targets.Add(transform.position);
-        } else {
-            Debug.LogError("Non-static move type must have children!");
+        if (transform.childCount == 0) {
+            if (typ == Type.Static) {
+                targets.Add(transform.position);
+            } else {
+                Debug.LogError("Non-static move type must have children!");
+            }
         }
     }
 
