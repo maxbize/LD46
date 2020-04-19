@@ -12,12 +12,13 @@ public class Moveable : MonoBehaviour
     public bool atTarget { get; set; }
     private State state;
     private float stateStartTime;
+    private float perlinSeed;
 
     // Defining here to be the same for all moveables
     private const float INITIAL_LERP_SPEED = 2f;
     private const float PATROL_START_TIME = 1f;
     private const float PATROL_END_TIME = 1f;
-    private const float PATROL_TO_LERP_SPEED = 3f;
+    private const float PATROL_TO_SPEED = 30f;
     private const float PATROL_FROM_LERP_SPEED = 1f;
 
     private enum State
@@ -33,7 +34,7 @@ public class Moveable : MonoBehaviour
 
     // Start is called before the first frame update
     void Start() {
-
+        perlinSeed = Random.Range(0f, 100f);
     }
 
     // Update is called once per frame
@@ -46,6 +47,11 @@ public class Moveable : MonoBehaviour
                 SwitchToState(State.WaitingToStart);
             }
 
+        // Chillin'
+        } else if (state == State.WaitingForNextConfig) {
+            float noiseX = Mathf.PerlinNoise(perlinSeed + Time.timeSinceLevelLoad, 0) - 0.5f;
+            float noiseY = Mathf.PerlinNoise(0, perlinSeed + Time.timeSinceLevelLoad) - 0.5f;
+            transform.position = config.GetTarget(0) + new Vector2(noiseX, noiseY);
         // Patrol states (loops)
         } else if (state == State.PatrolStart) {
             atTarget = false;
@@ -55,7 +61,11 @@ public class Moveable : MonoBehaviour
             }
         } else if (state == State.PatrolMoveTo) {
             Vector3 toTarget = (Vector3)config.GetTarget(1) - transform.position;
-            transform.position += toTarget * PATROL_TO_LERP_SPEED * Time.deltaTime;
+            Vector3 deltaPos = toTarget.normalized * PATROL_TO_SPEED * Time.deltaTime;
+            if (deltaPos.magnitude > toTarget.magnitude) {
+                deltaPos = toTarget;
+            }
+            transform.position += deltaPos;
             if (toTarget.magnitude < 1 / 16f) {
                 SwitchToState(State.PatrolWaitEnd);
             }
