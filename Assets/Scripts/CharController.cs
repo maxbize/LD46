@@ -25,6 +25,10 @@ public class CharController : MonoBehaviour
     public float wallJumpMoveRestrictTime;
     public float noAirFrictionTime;
     public float wallStickTime;
+    public float attackAnimTime;
+    public float attackCoolTime; // Total time including animation
+    public Sprite frame_Walk;
+    public Sprite frame_Attack;
 
     public AnimationCurve horizontalGroundVelocityRampUp;
     public AnimationCurve horizontalGroundVelocityRampDown;
@@ -54,6 +58,8 @@ public class CharController : MonoBehaviour
     private float jumpStartTime;
     private float wallStickStartTime;
     private bool newJumpInput = true;
+    private bool newAttackInput = false;
+    private float attackStartTime;
 
     private enum JumpState
     {
@@ -84,6 +90,7 @@ public class CharController : MonoBehaviour
         bool grounded = IsGrounded();
         int walled = IsWalled();
         float jumpTime = Time.timeSinceLevelLoad - jumpStartTime;
+        float attackTime = Time.timeSinceLevelLoad - attackStartTime;
 
         // Gravity
         //float gravity = 9.8f * gravityScale;
@@ -93,10 +100,24 @@ public class CharController : MonoBehaviour
         //float hDrag = rb.velocity.x * rb.velocity.x * horizontalDrag;
         //force += Vector2.left * Mathf.Sign(rb.velocity.x) * hDrag;
 
+        // Attack
+        if (newAttackInput && attackTime > attackCoolTime) {
+            attackStartTime = Time.timeSinceLevelLoad;
+            attackTime = Time.timeSinceLevelLoad - attackStartTime;
+            CheckAttackedBrain();
+        }
+        if (attackTime < attackAnimTime && sr.sprite != frame_Attack) {
+            sr.sprite = frame_Attack;
+        } else if (attackTime > attackAnimTime && sr.sprite == frame_Attack) {
+            sr.sprite = frame_Walk;
+        }
+
         // Input movement
         if (jumping == JumpState.WallJumpLocked && jumpTime < noAirFrictionTime) {
 
         } else if (!grounded && Time.timeSinceLevelLoad - wallStickStartTime < wallStickTime) {
+
+        } else if (attackTime < attackAnimTime) {
 
         } else {
             force += acceleration * moveDir;
@@ -117,7 +138,9 @@ public class CharController : MonoBehaviour
         // 2. Continuing an existing jump
         // 3. No longer jumping
         if (jumpInput) {
-            if (grounded && jumpStartTime == 0 && newJumpInput) {
+            if (attackTime < attackAnimTime) {
+                // Ignore jump input while attacking
+            } else if (grounded && jumpStartTime == 0 && newJumpInput) {
                 // Check ground jump
                 jumping = JumpState.Ground;
                 jumpTime = 0;
@@ -271,6 +294,27 @@ public class CharController : MonoBehaviour
         return 0;
     }
 
+    private void CheckAttackedBrain() {
+        int layerMask = 1 << LayerMask.NameToLayer("Environment");
+        RaycastHit2D hit = Physics2D.Raycast(col.bounds.center, Vector2.right, 1.75f, layerMask);
+
+        if (hit.collider != null) {
+            Moveable m = hit.transform.GetComponent<Moveable>();
+            if (m != null) {
+                levelManager.NotifyPlayerAttackedPart(m);
+            }
+        }
+
+        hit = Physics2D.Raycast(col.bounds.center, Vector2.left, 1.75f, layerMask);
+
+        if (hit.collider != null) {
+            Moveable m = hit.transform.GetComponent<Moveable>();
+            if (m != null) {
+                levelManager.NotifyPlayerAttackedPart(m);
+            }
+        }
+    }
+
     // Check if we need to notify level manager
     private void CheckHit(RaycastHit2D hit) {
         Moveable m = hit.transform.GetComponent<Moveable>();
@@ -290,9 +334,10 @@ public class CharController : MonoBehaviour
         return hit.collider != null;
     }
 
-    public void Move(Vector2 dir, bool jump, bool jumpDown) {
+    public void Move(Vector2 dir, bool jump, bool jumpDown, bool attackDown) {
         moveDir = dir;
         jumpInput = jump;
         newJumpInput = jumpDown;
+        newAttackInput = attackDown;
     }
 }

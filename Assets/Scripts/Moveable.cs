@@ -21,7 +21,7 @@ public class Moveable : MonoBehaviour
     private const float INITIAL_LERP_SPEED = 2f;
     private const float PATROL_START_TIME = 1f;
     private const float PATROL_END_TIME = 1f;
-    private const float PATROL_TO_SPEED = 30f;
+    private const float PATROL_TO_SPEED = 40f;
     private const float PATROL_FROM_LERP_SPEED = 1f;
     private const float PLAYER_TO_LERP_SPEED = 30f;
     private const float PLAYER_TO_MIN_DIST = 3f;
@@ -117,6 +117,7 @@ public class Moveable : MonoBehaviour
     public void SetConfig(MoveConfig config) {
         this.config = config;
         state = State.MoveToInitialTarget;
+        atTarget = false;
     }
 
     public void NotifyAllAtInitialTargets() {
@@ -135,6 +136,10 @@ public class Moveable : MonoBehaviour
     }
 
     public void NotifyPlayerTouchedOtherHand() {
+        if (config.typ != MoveConfig.Type.Player) {
+            return;
+        }
+
         if (targetIndex < config.NumTargets() - 1) {
             Debug.Log(name + " moving to target " + (targetIndex + 1));
             targetIndex++;

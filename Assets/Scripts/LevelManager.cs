@@ -12,19 +12,20 @@ public class LevelManager : MonoBehaviour
     public Moveable rightHand;
     public Moveable brain;
     public Transform player;
+    public int hitsPerLevel;
 
     private List<Moveable> parts;
-    private bool firstReady;
     private Moveable nextPart; // Next part player needs to touch to advance Player level sequence
+    private int hitsLeft;
 
     // Start is called before the first frame update
     void Start() {
+        parts = new List<Moveable>() { leftHand, rightHand, brain };
         StartLevel(currentLevel);
     }
 
     // Update is called once per frame
     void Update() {
-        parts = new List<Moveable>() { leftHand, rightHand, brain };
 
         // Hack!
         if (player.position.y < 0.1f) {
@@ -34,7 +35,7 @@ public class LevelManager : MonoBehaviour
     }
 
     private void StartLevel(int index) {
-        firstReady = true;
+        hitsLeft = hitsPerLevel;
         foreach (MoveConfig config in levels.GetChild(currentLevel).GetComponentsInChildren<MoveConfig>()) {
             if (config.part == MoveConfig.Part.LeftHand) {
                 leftHand.SetConfig(config);
@@ -56,6 +57,10 @@ public class LevelManager : MonoBehaviour
     }
 
     public void NotifyPlayerTouchedPart(Moveable part) {
+        if (parts.Any(p => !p.atTarget)) {
+            return;
+        }
+
         if (part == nextPart) {
             if (part == rightHand) {
                 nextPart = leftHand;
@@ -65,6 +70,18 @@ public class LevelManager : MonoBehaviour
                 Debug.LogError("Unexpected nextPart: " + part);
             }
             nextPart.NotifyPlayerTouchedOtherHand();
+        }
+    }
+
+    public void NotifyPlayerAttackedPart(Moveable part) {
+        if (part == brain) {
+            hitsLeft--;
+            if (hitsLeft <= 0) {
+                currentLevel++;
+                if (currentLevel < levels.childCount) {
+                    StartLevel(currentLevel);
+                }
+            }
         }
     }
 
