@@ -70,6 +70,9 @@ public class Moveable : MonoBehaviour
             float noiseX = Mathf.PerlinNoise(perlinSeed + Time.timeSinceLevelLoad, 0) - 0.5f;
             float noiseY = Mathf.PerlinNoise(0, perlinSeed + Time.timeSinceLevelLoad) - 0.5f;
             transform.position = config.GetTarget(0) + new Vector2(noiseX, noiseY);
+            if (config.part == MoveConfig.Part.Brain && !heartParticles.isPlaying) {
+                heartParticles.Play();
+            }
 
         // Patrol states (loops)
         } else if (state == State.PatrolStart) {
@@ -125,8 +128,8 @@ public class Moveable : MonoBehaviour
 
     public void SetConfig(MoveConfig config) {
         this.config = config;
-        state = State.MoveToInitialTarget;
         atTarget = false;
+        SwitchToState(State.MoveToInitialTarget);
     }
 
     public void NotifyAllAtInitialTargets() {
@@ -174,6 +177,7 @@ public class Moveable : MonoBehaviour
         }
 
         if (config.part == MoveConfig.Part.Brain) {
+            Debug.Log("Brain Switching to state " + state);
             if (state == State.WaitingForNextConfig) {
                 heartParticles.Play();
             } else {

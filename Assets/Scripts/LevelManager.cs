@@ -50,7 +50,6 @@ public class LevelManager : MonoBehaviour
                 StartLevel(currentLevel);
             }
         } else if (endMenu.activeSelf) {
-            heart.transform.position = new Vector2(1, 9.5f);
         } else {
             // Hack!
             if (player.position.y < 0.1f) {
