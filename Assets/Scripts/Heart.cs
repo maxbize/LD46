@@ -41,7 +41,7 @@ public class Heart : MonoBehaviour
 
         if (Time.timeSinceLevelLoad - lastPulseTime > 1.5f) {
             lastPulseTime = Time.timeSinceLevelLoad;
-            pp.SendPulse(transform.position); // heh heh :P
+            //pp.SendPulse(transform.position); // heh heh :P
         }
     }
 }
