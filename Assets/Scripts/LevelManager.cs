@@ -109,6 +109,8 @@ public class LevelManager : MonoBehaviour
             brainScript.NotifyHurt();
             hitsLeft--;
             if (hitsLeft <= 0) {
+                Vector3 brainToPlayer = player.position - brain.transform.position;
+                player.GetComponent<Rigidbody2D>().velocity = brainToPlayer.normalized * 10;
                 currentLevel++;
                 if (currentLevel < levels.childCount) {
                     StartLevel(currentLevel);
