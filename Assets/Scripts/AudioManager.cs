@@ -11,6 +11,8 @@ public class AudioManager : MonoBehaviour
     public AudioClip handPatrolShake;
     public AudioClip handPatrolMove;
     public AudioClip handReset;
+    public AudioClip heartbeat;
+    public AudioClip attackMiss;
 
     private Vector3 clipPositions;
 

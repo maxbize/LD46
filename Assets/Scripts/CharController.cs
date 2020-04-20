@@ -316,9 +316,13 @@ public class CharController : MonoBehaviour
 
         if (hit.collider != null) {
             Moveable m = hit.transform.GetComponent<Moveable>();
-            if (m != null) {
+            if (m != null && m.config.part == MoveConfig.Part.Brain) {
                 levelManager.NotifyPlayerAttackedPart(m);
+            } else {
+                audioManager.PlayClip(audioManager.attackMiss);
             }
+        } else {
+            audioManager.PlayClip(audioManager.attackMiss);
         }
     }
 

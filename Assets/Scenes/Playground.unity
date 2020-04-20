@@ -5776,6 +5776,8 @@ MonoBehaviour:
   handPatrolShake: {fileID: 8300000, guid: e132c7dee16b2be4f9b6218cf21f9027, type: 3}
   handPatrolMove: {fileID: 8300000, guid: f6418e6fb45236d4caa3acfbb81d529d, type: 3}
   handReset: {fileID: 8300000, guid: 9dc559d4260c2cc4e8d6f8ae2380c575, type: 3}
+  heartbeat: {fileID: 8300000, guid: 4291cac38f2a45246b5454b141a4c929, type: 3}
+  attackMiss: {fileID: 8300000, guid: 5431012d9f5cc4645978c26793d6e624, type: 3}
 --- !u!4 &1225371654
 Transform:
   m_ObjectHideFlags: 0
@@ -15794,6 +15796,7 @@ MonoBehaviour:
   endMenu: {fileID: 340245292}
   heartParticles: {fileID: 1258595495}
   springCoeffient: 2
+  audioManager: {fileID: 1225371653}
 --- !u!1 &1515375998
 GameObject:
   m_ObjectHideFlags: 0

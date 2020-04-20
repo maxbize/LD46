@@ -15,12 +15,14 @@ public class Heart : MonoBehaviour
     public GameObject endMenu;
     public ParticleSystem heartParticles;
     public float springCoeffient;
+    public AudioManager audioManager;
 
     private List<LineRenderer> lineRenderers = new List<LineRenderer>();
     private Vector2 targetPos;
     private float perlinSeed;
     private List<Vector2> bezierOffsets = new List<Vector2>();
     private SpriteRenderer playerSr;
+    private int audioCounter;
 
     private float lastPulseTime;
 
@@ -68,9 +70,15 @@ public class Heart : MonoBehaviour
             heartParticles.Stop();
         }
 
-        if (Time.timeSinceLevelLoad - lastPulseTime > 1.5f) {
+        float pulseTime = Time.timeSinceLevelLoad - lastPulseTime;
+        if (pulseTime > 1.5f) {
             lastPulseTime = Time.timeSinceLevelLoad;
+            audioCounter = 0;
             pp.SendPulse(transform.position); // heh heh :P
+            audioManager.PlayClip(audioManager.heartbeat);
+        } else if (pulseTime > 0.2f && audioCounter == 0) {
+            audioManager.PlayClip(audioManager.heartbeat);
+            audioCounter++;
         }
 
         float noiseX = Mathf.PerlinNoise(perlinSeed + Time.timeSinceLevelLoad, 0) - 0.5f;
