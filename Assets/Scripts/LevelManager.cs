@@ -20,6 +20,8 @@ public class LevelManager : MonoBehaviour
     public Text endMenuBody1;
     public Text endMenuBody2;
     public Brain brainScript;
+    public AudioSource songSource;
+    public AudioManager audioManager;
 
     private List<Moveable> parts;
     private Moveable nextPart; // Next part player needs to touch to advance Player level sequence
@@ -45,6 +47,7 @@ public class LevelManager : MonoBehaviour
         if (startMenu.activeSelf) {
             heart.GetComponent<SpriteRenderer>().sortingLayerName = "Foreground";
             if (Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.X)) {
+                songSource.Play();
                 startMenu.SetActive(false);
                 heart.GetComponent<SpriteRenderer>().sortingLayerName = "Background";
                 gameStartTime = Time.timeSinceLevelLoad;
@@ -102,6 +105,7 @@ public class LevelManager : MonoBehaviour
 
     public void NotifyPlayerAttackedPart(Moveable part) {
         if (part == brain) {
+            audioManager.PlayClip(audioManager.hurtClip);
             brainScript.NotifyHurt();
             hitsLeft--;
             if (hitsLeft <= 0) {

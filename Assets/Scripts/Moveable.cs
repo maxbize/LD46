@@ -9,6 +9,7 @@ public class Moveable : MonoBehaviour
     public Transform player;
     public Transform heart;
     public ParticleSystem heartParticles;
+    public AudioManager audioManager;
 
     public MoveConfig config { get; set; }
     public bool atTarget { get; set; }
@@ -164,6 +165,9 @@ public class Moveable : MonoBehaviour
             atTarget = false;
             targetIndex = 0;
             SwitchToState(State.MoveToInitialTarget);
+            if (config.part == MoveConfig.Part.LeftHand) {
+                audioManager.PlayClip(audioManager.handReset);
+            }
         }
     }
 
@@ -175,6 +179,24 @@ public class Moveable : MonoBehaviour
             atTarget = true;
             levelManager.NotifyPartAtTarget(this);
         }
+
+        // For actions where both hands would play
+        if (config.part == MoveConfig.Part.LeftHand) {
+            if (state == State.PatrolStart) {
+                audioManager.PlayClip(audioManager.handPatrolShake);
+            } else if (state == State.PatrolMoveTo) {
+                audioManager.PlayClip(audioManager.handPatrolMove);
+            }
+        }
+
+        if (state == State.PlayerMoveTo) {
+            audioManager.PlayClip(audioManager.handPatrolMove);
+        }
+
+        if (state == State.MoveToInitialTarget && config.part == MoveConfig.Part.Brain) {
+            audioManager.PlayClip(audioManager.headMove);
+        }
+
 
         if (config.part == MoveConfig.Part.Brain) {
             Debug.Log("Brain Switching to state " + state);

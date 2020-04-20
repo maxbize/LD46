@@ -31,6 +31,7 @@ public class CharController : MonoBehaviour
     public Sprite frame_Attack;
     public GameObject jumpEffectPrefab;
     public ParticleSystem wallSlideParticles;
+    public AudioManager audioManager;
 
     public AnimationCurve horizontalGroundVelocityRampUp;
     public AnimationCurve horizontalGroundVelocityRampDown;
@@ -149,6 +150,7 @@ public class CharController : MonoBehaviour
                 rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
                 jumpStartTime = Time.timeSinceLevelLoad;
                 Instantiate(jumpEffectPrefab, transform.position, sr.flipX ? Quaternion.Euler(180, 0, 180) : Quaternion.Euler(0, 0, 0));
+                audioManager.PlayClip(audioManager.jumpClip);
             //} else if (walled != 0 && !grounded && jumpStartTime == 0 && newJumpInput) {
             } else if (walled != 0 && !grounded && newJumpInput) {
                 // Check wall jump
@@ -159,6 +161,7 @@ public class CharController : MonoBehaviour
                 rb.AddForce(Vector2.left * walled * wallJumpXForce, ForceMode2D.Impulse);
                 jumpStartTime = Time.timeSinceLevelLoad;
                 Instantiate(jumpEffectPrefab, transform.position + Vector3.right * walled * col.bounds.extents.x, sr.flipX ? Quaternion.Euler(180, 0, -90) : Quaternion.Euler(0, 0, 90));
+                audioManager.PlayClip(audioManager.jumpClip);
             } else if (Time.timeSinceLevelLoad - jumpStartTime < jumpSustainTime) {
                 force += Vector2.up * jumpSustainForce;
             }
@@ -309,16 +312,7 @@ public class CharController : MonoBehaviour
 
     private void CheckAttackedBrain() {
         int layerMask = 1 << LayerMask.NameToLayer("Environment");
-        RaycastHit2D hit = Physics2D.Raycast(col.bounds.center, Vector2.right, 1.75f, layerMask);
-
-        if (hit.collider != null) {
-            Moveable m = hit.transform.GetComponent<Moveable>();
-            if (m != null) {
-                levelManager.NotifyPlayerAttackedPart(m);
-            }
-        }
-
-        hit = Physics2D.Raycast(col.bounds.center, Vector2.left, 1.75f, layerMask);
+        RaycastHit2D hit = Physics2D.Raycast(col.bounds.center, Vector2.right * (sr.flipX ? -1 : 1), 1.75f, layerMask);
 
         if (hit.collider != null) {
             Moveable m = hit.transform.GetComponent<Moveable>();
