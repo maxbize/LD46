@@ -8,6 +8,7 @@ public class CharController : MonoBehaviour
     public LevelManager levelManager;
     public float acceleration;
     public float coyoteTime; // Only for grounded jumps
+    public float jumpBufferTime; // How long to count a jump input as "down/new"
     public float jumpForce;
     public float jumpSustainForce;
     public float jumpSustainTime;
@@ -41,6 +42,7 @@ public class CharController : MonoBehaviour
     private bool newAttackInput = false;
     private float attackStartTime;
     private float lastGroundedTime;
+    private float lastNewJumpInputTime;
 
     private enum JumpState
     {
@@ -71,10 +73,12 @@ public class CharController : MonoBehaviour
         float jumpTime = Time.timeSinceLevelLoad - jumpStartTime;
         float attackTime = Time.timeSinceLevelLoad - attackStartTime;
 
+        // Update grace timers
         if (grounded) {
             lastGroundedTime = Time.timeSinceLevelLoad;
         }
         float lastGroundedElapsed = Time.timeSinceLevelLoad - lastGroundedTime;
+        float lastNewJumpInputElapsed = Time.timeSinceLevelLoad - lastNewJumpInputTime;
 
         // Attack
         if (newAttackInput && attackTime > attackCoolTime) {
@@ -116,11 +120,12 @@ public class CharController : MonoBehaviour
         if (jumpInput) {
             if (attackTime < attackAnimTime) {
                 // Ignore jump input while attacking
-            } else if (lastGroundedElapsed < coyoteTime && jumpStartTime == 0 && newJumpInput) {
+            } else if (lastGroundedElapsed < coyoteTime && jumpStartTime == 0 && lastNewJumpInputElapsed < jumpBufferTime) {
                 // Check ground jump
                 lastGroundedTime = 0;
                 jumping = JumpState.Ground;
                 jumpTime = 0;
+                lastNewJumpInputTime = 0;
                 if (!grounded) { // coyote jump. Need to clear y vel first or it won't be a full jump
                     rb.velocity = new Vector2(rb.velocity.x, 0);
                 }
@@ -129,10 +134,11 @@ public class CharController : MonoBehaviour
                 Instantiate(jumpEffectPrefab, transform.position, sr.flipX ? Quaternion.Euler(180, 0, 180) : Quaternion.Euler(0, 0, 0));
                 audioManager.PlayClip(audioManager.jumpClip);
             //} else if (walled != 0 && !grounded && jumpStartTime == 0 && newJumpInput) {
-            } else if (walled != 0 && !grounded && newJumpInput) {
+            } else if (walled != 0 && !grounded && lastNewJumpInputElapsed < jumpBufferTime) {
                 // Check wall jump
                 jumping = JumpState.WallJumpLocked;
                 jumpTime = 0;
+                lastNewJumpInputTime = 0;
                 rb.velocity = Vector2.zero;
                 rb.AddForce(Vector2.up * wallJumpYForce, ForceMode2D.Impulse);
                 rb.AddForce(Vector2.left * walled * wallJumpXForce, ForceMode2D.Impulse);
@@ -262,5 +268,8 @@ public class CharController : MonoBehaviour
         jumpInput = jump;
         newJumpInput = jumpDown;
         newAttackInput = attackDown;
+        if (jumpDown) {
+            lastNewJumpInputTime = Time.timeSinceLevelLoad;
+        }
     }
 }
