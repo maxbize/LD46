@@ -28,6 +28,7 @@ public class Heart : MonoBehaviour
 
     // Start is called before the first frame update
     void Start() {
+        perlinSeed = Random.Range(-100, 100);
         heartParticles.Stop();
         playerSr = player.GetComponent<SpriteRenderer>();
         targetPos = transform.position;

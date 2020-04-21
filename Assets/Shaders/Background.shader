@@ -17,8 +17,8 @@
 			float _TimeSinceLevelLoad;
 
 			float4 frag(v2f_img i) : COLOR {
-				float2 fragScreenPos = i.uv * _ScreenParams.xy;
-				float distToCenter = distance(i.uv, float2(0.5, 0.5));
+				float2 fragScreenPos = uv * _ScreenParams.xy;
+				float distToCenter = distance(uv, float2(0.5, 0.5));
 				float distStepped = round(distToCenter * 5) / 5 + 0.2;
 
 				return distStepped;

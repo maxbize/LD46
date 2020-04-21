@@ -8,6 +8,7 @@
 	}
 	SubShader {
 		Pass {
+			ZWrite Off
 			CGPROGRAM
 			#pragma vertex vert_img
 			#pragma fragment frag
@@ -23,6 +24,12 @@
 			float _PulseDistance;
 
 			float4 frag(v2f_img i) : COLOR {
+				// Ideally, this effect would work on the scaled down texture instead of this hack
+				//float2 uv = float2(floor(i.uv.x * 320) / 320, floor(i.uv.y * 270) / 270);
+				//float2 uv = float2(ceil(i.uv.x * 320) / 320, i.uv.y);
+				//uv = float2(ceil(i.uv.x * 320.) / 320., ceil(i.uv.y * 270.) / 270.);
+				//uv.x = i.uv.x;
+
 				float2 pulseUV = _Pulse.xy;
 				float pulseStartTime = _Pulse.z;
 				float2 fragScreenPos = i.uv * _ScreenParams.xy;

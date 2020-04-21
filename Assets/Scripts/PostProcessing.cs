@@ -6,9 +6,11 @@ public class PostProcessing : MonoBehaviour
 {
     // Set in editor
     public Transform heart;
+    public RenderTexture postRT;
 
     private Camera cam;
     private Material material;
+    private RenderTexture tempRT;
 
     // Start is called before the first frame update
     void Start() {
@@ -26,6 +28,28 @@ public class PostProcessing : MonoBehaviour
     private void Update() {
         Shader.SetGlobalFloat("_TimeSinceLevelLoad", Time.timeSinceLevelLoad);
     }
+
+    /*
+    private void OnRenderObject() {
+        tempRT = RenderTexture.GetTemporary(Screen.width, Screen.height);
+        tempRT.filterMode = FilterMode.Point;
+
+        //RenderTexture active = RenderTexture.active;
+
+        Graphics.Blit(cam.activeTexture, tempRT, material);
+
+        //cam.targetTexture = null;
+        //Graphics.Blit(tempRT, null as RenderTexture);
+
+        //Graphics.Blit(tempRT, cam.activeTexture);
+
+        RenderTexture.ReleaseTemporary(tempRT);
+
+        //Graphics.Blit(source, postRT, material);
+        //Graphics.Blit(postRT, destination, material);
+
+    }
+    */
 
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
         Graphics.Blit(source, destination, material);
