@@ -9,6 +9,7 @@ public class CharController : MonoBehaviour
     public float acceleration;
     public float coyoteTime; // Only for grounded jumps
     public float jumpBufferTime; // How long to count a jump input as "down/new"
+    public float wallJumpGrace; // How many pixels away from the wall you can be for a jump
     public float jumpForce;
     public float jumpSustainForce;
     public float jumpSustainTime;
@@ -195,24 +196,25 @@ public class CharController : MonoBehaviour
 
     // -1 left wall, 0 not walled, 1 right wall
     private int IsWalled() {
+        float wallDist = wallJumpGrace / 16f;
         int layerMask = 1 << LayerMask.NameToLayer("Environment");
-        RaycastHit2D hit = Physics2D.Raycast((Vector2)col.bounds.center - Vector2.up * col.bounds.extents.y * 0.9f, Vector2.right, (col.bounds.extents.x + 1 / 16f), layerMask);
+        RaycastHit2D hit = Physics2D.Raycast((Vector2)col.bounds.center - Vector2.up * col.bounds.extents.y * 0.9f, Vector2.right, (col.bounds.extents.x + wallDist), layerMask);
         if (hit.collider != null) {
             CheckHit(hit);
             return 1;
         }
-        hit = Physics2D.Raycast((Vector2)col.bounds.center + Vector2.up * col.bounds.extents.y * 0.9f, Vector2.right, (col.bounds.extents.x + 1 / 16f), layerMask);
+        hit = Physics2D.Raycast((Vector2)col.bounds.center + Vector2.up * col.bounds.extents.y * 0.9f, Vector2.right, (col.bounds.extents.x + wallDist), layerMask);
         if (hit.collider != null) {
             CheckHit(hit);
             return 1;
         }
 
-        hit = Physics2D.Raycast((Vector2)col.bounds.center - Vector2.up * col.bounds.extents.y * 0.9f, Vector2.left, (col.bounds.extents.x + 1 / 16f), layerMask);
+        hit = Physics2D.Raycast((Vector2)col.bounds.center - Vector2.up * col.bounds.extents.y * 0.9f, Vector2.left, (col.bounds.extents.x + wallDist), layerMask);
         if (hit.collider != null) {
             CheckHit(hit);
             return -1;
         }
-        hit = Physics2D.Raycast((Vector2)col.bounds.center + Vector2.up * col.bounds.extents.y * 0.9f, Vector2.left, (col.bounds.extents.x + 1 / 16f), layerMask);
+        hit = Physics2D.Raycast((Vector2)col.bounds.center + Vector2.up * col.bounds.extents.y * 0.9f, Vector2.left, (col.bounds.extents.x + wallDist), layerMask);
         if (hit.collider != null) {
             CheckHit(hit);
             return -1;
