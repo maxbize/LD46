@@ -21,8 +21,6 @@ public class HumanInput : MonoBehaviour
 
     // Update is called once per frame
     void FixedUpdate() {
-        jumpDownFlag |= Input.GetKeyDown(KeyCode.X);
-        attackDownFlag |= Input.GetKeyDown(KeyCode.C);
         charController.Move(Vector2.right * Input.GetAxisRaw("Horizontal"), Input.GetKey(KeyCode.X), jumpDownFlag, attackDownFlag);
         jumpDownFlag = false;
         attackDownFlag = false;
