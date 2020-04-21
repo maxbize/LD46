@@ -7,10 +7,7 @@ public class CharController : MonoBehaviour
     // Set in editor
     public LevelManager levelManager;
     public float acceleration;
-    public float gravityScale;
-    public float horizontalDrag;
-    public float noMoveDrag;
-    public float verticalDrag;
+    public float coyoteTime; // Only for grounded jumps
     public float jumpForce;
     public float jumpSustainForce;
     public float jumpSustainTime;
@@ -22,7 +19,6 @@ public class CharController : MonoBehaviour
     public float maxXVelAirWallJump;
     public float wallJumpXForce;
     public float wallJumpYForce;
-    public float wallJumpMoveRestrictTime;
     public float noAirFrictionTime;
     public float wallStickTime;
     public float attackAnimTime;
@@ -32,25 +28,6 @@ public class CharController : MonoBehaviour
     public GameObject jumpEffectPrefab;
     public ParticleSystem wallSlideParticles;
     public AudioManager audioManager;
-
-    public AnimationCurve horizontalGroundVelocityRampUp;
-    public AnimationCurve horizontalGroundVelocityRampDown;
-    public AnimationCurve verticalFreefallVelocityRamp;
-    public AnimationCurve verticalGroundedVelocityRamp;
-    public AnimationCurve jumpVelocityRamp;
-
-    // Ramp up/down horizontal velocity while grounded/aired
-    // Jump vertical velocity
-    // Wall jump horizontal/vertical velocity
-    // Air strike velocity
-
-    // Curve x = time, y = velocity
-
-    // Velocity movement test
-    private AnimationCurve currentHorizontalCurve;
-    private float horizontalCurveStartTime;
-    private AnimationCurve currentVerticalCurve;
-    private float verticalCurveStartTime;
 
     private Rigidbody2D rb;
     private Collider2D col;
@@ -63,6 +40,7 @@ public class CharController : MonoBehaviour
     private bool newJumpInput = true;
     private bool newAttackInput = false;
     private float attackStartTime;
+    private float lastGroundedTime;
 
     private enum JumpState
     {
@@ -87,21 +65,16 @@ public class CharController : MonoBehaviour
     // This is an absolute mess. If I had more time, I'd want to simplify as much as possible.
     // Maybe just a single moveState powering a state machine and a single stateStart timer
     private void FixedUpdate() {
-        //FindCurves();
-
         Vector2 force = Vector2.zero;
         bool grounded = IsGrounded();
         int walled = IsWalled();
         float jumpTime = Time.timeSinceLevelLoad - jumpStartTime;
         float attackTime = Time.timeSinceLevelLoad - attackStartTime;
 
-        // Gravity
-        //float gravity = 9.8f * gravityScale;
-        //force += Vector2.down * gravity;
-
-        // Drag
-        //float hDrag = rb.velocity.x * rb.velocity.x * horizontalDrag;
-        //force += Vector2.left * Mathf.Sign(rb.velocity.x) * hDrag;
+        if (grounded) {
+            lastGroundedTime = Time.timeSinceLevelLoad;
+        }
+        float lastGroundedElapsed = Time.timeSinceLevelLoad - lastGroundedTime;
 
         // Attack
         if (newAttackInput && attackTime > attackCoolTime) {
@@ -143,10 +116,14 @@ public class CharController : MonoBehaviour
         if (jumpInput) {
             if (attackTime < attackAnimTime) {
                 // Ignore jump input while attacking
-            } else if (grounded && jumpStartTime == 0 && newJumpInput) {
+            } else if (lastGroundedElapsed < coyoteTime && jumpStartTime == 0 && newJumpInput) {
                 // Check ground jump
+                lastGroundedTime = 0;
                 jumping = JumpState.Ground;
                 jumpTime = 0;
+                if (!grounded) { // coyote jump. Need to clear y vel first or it won't be a full jump
+                    rb.velocity = new Vector2(rb.velocity.x, 0);
+                }
                 rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
                 jumpStartTime = Time.timeSinceLevelLoad;
                 Instantiate(jumpEffectPrefab, transform.position, sr.flipX ? Quaternion.Euler(180, 0, 180) : Quaternion.Euler(0, 0, 0));
@@ -208,79 +185,7 @@ public class CharController : MonoBehaviour
         } else if ((jumping == JumpState.Ground || jumping == JumpState.None) && Mathf.Abs(rb.velocity.x) > maxXVelGround) {
             rb.velocity = new Vector2(maxXVelGround * Mathf.Sign(rb.velocity.x), rb.velocity.y);
         }
-        /*
-        if (grounded && Mathf.Abs(rb.velocity.x) > maxXVelGround) {
-            rb.velocity = new Vector2(maxXVelGround * Mathf.Sign(rb.velocity.x), rb.velocity.y);
-        } else if (!grounded && Mathf.Abs(rb.velocity.x) > maxXVelAir) {
-            rb.velocity = new Vector2(maxXVelAir * Mathf.Sign(rb.velocity.x), rb.velocity.y);
-        }
-        */
-
-        //if (Mathf.Abs(rb.velocity.x) < 0.5 && moveDir.x == 0) {
-        //    rb.velocity = Vector2.up * rb.velocity.y; // Clear x velocity
-        //} 
-
-        /*
-        // Horizontal velocity curve
-        Vector2 velocity = rb.velocity;
-        float horizontalCurveTime = Time.timeSinceLevelLoad - horizontalCurveStartTime;
-        if (currentHorizontalCurve == horizontalGroundVelocityRampUp) {
-            velocity.x = moveDir.x * horizontalGroundVelocityRampUp.Evaluate(horizontalCurveTime);
-        } else if (currentHorizontalCurve == horizontalGroundVelocityRampDown) {
-            velocity.x = Mathf.Sign(velocity.x) * horizontalGroundVelocityRampDown.Evaluate(horizontalCurveTime);
-        }
-
-        // Vertical velocity curve
-        float verticalCurveTime = Time.timeSinceLevelLoad - verticalCurveStartTime;
-        velocity.y = currentVerticalCurve.Evaluate(verticalCurveTime);
-
-        if (Mathf.Abs(velocity.x) > 0.1f) {
-            sr.flipX = velocity.x < 0;
-        }
-
-        rb.velocity = velocity;
-        */
     }
-
-    // Figure out which curve we're on
-    /*
-    private void FindCurves() {
-        AnimationCurve candidateCurve = null;
-        bool grounded = IsGrounded();
-
-        // Horizontal
-        if (moveDir.magnitude > 0.1) {
-            candidateCurve = horizontalGroundVelocityRampUp;
-        } else {
-            candidateCurve = horizontalGroundVelocityRampDown;
-        }
-
-        if (candidateCurve != currentHorizontalCurve) {
-            currentHorizontalCurve = candidateCurve;
-            horizontalCurveStartTime = Time.timeSinceLevelLoad;
-        }
-
-        // Vertical
-        candidateCurve = null;
-
-        if (grounded) {
-            if (jumpInput) {
-                candidateCurve = jumpVelocityRamp;
-            } else {
-                candidateCurve = verticalGroundedVelocityRamp;
-            }
-        } else {
-            if (!(currentVerticalCurve == jumpVelocityRamp && jumpInput)) {
-                candidateCurve = verticalFreefallVelocityRamp;
-            }
-        }
-
-        if (candidateCurve != currentVerticalCurve && candidateCurve != null) {
-            currentVerticalCurve = candidateCurve;
-            verticalCurveStartTime = Time.timeSinceLevelLoad;
-        }
-    }
-    */
 
     // -1 left wall, 0 not walled, 1 right wall
     private int IsWalled() {
@@ -336,13 +241,20 @@ public class CharController : MonoBehaviour
 
     private bool IsGrounded() {
         int layerMask = 1 << LayerMask.NameToLayer("Environment");
-        RaycastHit2D hit = Physics2D.Raycast(col.bounds.center, Vector2.down, (col.bounds.extents.y + 1 / 16f), layerMask);
+        RaycastHit2D hit = Physics2D.Raycast(col.bounds.center + Vector3.right * col.bounds.extents.x * 0.9f, Vector2.down, (col.bounds.extents.y + 1 / 16f), layerMask);
 
-        //Debug.DrawRay(col.bounds.center, Vector2.down * (col.bounds.extents.y + 1/16f), hit.collider == null ? Color.red : Color.green);
         if (hit.collider != null) {
             CheckHit(hit);
+            return true;
         }
-        return hit.collider != null;
+
+        hit = Physics2D.Raycast(col.bounds.center - Vector3.right * col.bounds.extents.x * 0.9f, Vector2.down, (col.bounds.extents.y + 1 / 16f), layerMask);
+
+        if (hit.collider != null) {
+            CheckHit(hit);
+            return true;
+        }
+        return false;
     }
 
     public void Move(Vector2 dir, bool jump, bool jumpDown, bool attackDown) {

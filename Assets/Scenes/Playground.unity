@@ -1215,6 +1215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heart: {fileID: 1500120211}
+  postRT: {fileID: 0}
 --- !u!1 &530987592
 GameObject:
   m_ObjectHideFlags: 0
@@ -2242,7 +2243,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &856608320
 RectTransform:
   m_ObjectHideFlags: 0
@@ -16473,6 +16474,11 @@ PrefabInstance:
       propertyPath: audioManager
       value: 
       objectReference: {fileID: 1225371653}
+    - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
+        type: 3}
+      propertyPath: coyoteTime
+      value: 0.15
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 470191cb3bdb3e640a81935cd0a2e3e4, type: 3}
 --- !u!1 &1642432869 stripped
