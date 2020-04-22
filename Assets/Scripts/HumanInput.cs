@@ -15,13 +15,13 @@ public class HumanInput : MonoBehaviour
     }
 
     private void Update() {
-        jumpDownFlag |= Input.GetKeyDown(KeyCode.X);
+        jumpDownFlag |= Input.GetKeyDown(KeyCode.X) | Input.GetKeyDown(KeyCode.UpArrow);
         attackDownFlag |= Input.GetKeyDown(KeyCode.C);
     }
 
     // Update is called once per frame
     void FixedUpdate() {
-        charController.Move(Vector2.right * Input.GetAxisRaw("Horizontal"), Input.GetKey(KeyCode.X), jumpDownFlag, attackDownFlag);
+        charController.Move(Vector2.right * Input.GetAxisRaw("Horizontal"), Input.GetKey(KeyCode.X) | Input.GetKey(KeyCode.UpArrow), jumpDownFlag, attackDownFlag);
         jumpDownFlag = false;
         attackDownFlag = false;
     }
