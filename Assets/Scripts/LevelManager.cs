@@ -87,19 +87,16 @@ public class LevelManager : MonoBehaviour
     }
 
     public void NotifyPlayerTouchedPart(Moveable part) {
-        if (parts.Any(p => !p.atTarget)) {
+        /*if (parts.Any(p => !p.atTarget)) {
             return;
-        }
+        }*/
+
 
         if (part == nextPart) {
-            if (part == rightHand) {
-                nextPart = leftHand;
-            } else if (part == leftHand) {
-                nextPart = rightHand;
-            } else {
-                Debug.LogError("Unexpected nextPart: " + part);
+            if (nextPart.OtherCanMoveToNextPlayerSpot()) {
+                nextPart = nextPart == leftHand ? rightHand : leftHand;
+                nextPart.NotifyPlayerTouchedOtherHand();
             }
-            nextPart.NotifyPlayerTouchedOtherHand();
         }
     }
 
