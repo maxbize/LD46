@@ -122,7 +122,7 @@ public class LevelManager : MonoBehaviour
         endMenu.SetActive(true);
         heart.GetComponent<SpriteRenderer>().sortingLayerName = "Foreground";
         string time = (Time.timeSinceLevelLoad - gameStartTime).ToString("F1");
-        string s = "thanks for playing!\ntime: " + time + " sec\nmade in 48 hours for LD46\n\"keep it alive\"\n@maxbize";
+        string s = "\nThanks for playing!\nTime: " + time + " sec\n\n@maxbize";
         endMenuBody1.text = s;
         endMenuBody2.text = s;
     }
