@@ -19,7 +19,7 @@
 
 				float2 fragScreenPos = i.uv * _ScreenParams.xy;
 				
-				float distToCenter = distance(i.uv, float2(0.5, 0.5));
+				float distToCenter = distance(sin(i.uv * 1000 + _TimeSinceLevelLoad), float2(0.5, 0.5));
 
 				// Spiral effects
 				float angle = atan2(i.uv.y - 0.5, i.uv.x - 0.5);
@@ -32,7 +32,7 @@
 				distToCenter = distance(i.uv, float2(
 					0.5 + cos(_TimeSinceLevelLoad * 0.5) * 0.02 * (1 - distToCenter), 
 					0.5 + sin(_TimeSinceLevelLoad * 0.5) * 0.02 * (1 - distToCenter)));
-				distToCenter = pow(distToCenter, 0.5);
+				distToCenter = pow(distToCenter, 1);
 
 				float distStepped = round(distToCenter * 5) / 5;
 
