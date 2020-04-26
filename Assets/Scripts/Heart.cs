@@ -30,7 +30,7 @@ public class Heart : MonoBehaviour
     void Start() {
         perlinSeed = Random.Range(-100, 100);
         heartParticles.Stop();
-        playerSr = player.GetComponent<SpriteRenderer>();
+        playerSr = player.GetComponentInChildren<SpriteRenderer>();
         targetPos = transform.position;
         for (int i = 0; i < linkStarts.Count; i++) {
             GameObject childLink = new GameObject("Heart link " + i);

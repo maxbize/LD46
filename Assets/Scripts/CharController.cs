@@ -30,6 +30,11 @@ public class CharController : MonoBehaviour
     public GameObject jumpEffectPrefab;
     public ParticleSystem wallSlideParticles;
     public AudioManager audioManager;
+    public Transform spriteObj;
+    public float squashTime;
+    public float squashAmount;
+    public float stretchTime;
+    public float stretchAmount;
 
     private Rigidbody2D rb;
     private Collider2D col;
@@ -44,6 +49,8 @@ public class CharController : MonoBehaviour
     private float attackStartTime;
     private float lastGroundedTime;
     private float lastNewJumpInputTime;
+    private float squashStartTime;
+    private float stretchStartTime;
 
     private enum JumpState
     {
@@ -57,12 +64,26 @@ public class CharController : MonoBehaviour
     void Start() {
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
-        sr = GetComponent<SpriteRenderer>();
+        sr = GetComponentInChildren<SpriteRenderer>();
     }
 
     // Update is called once per frame
     void Update() {
+        Vector3 spriteScale = spriteObj.localScale;
 
+        float squashElapsed = Time.timeSinceLevelLoad - squashStartTime;
+        if (squashElapsed < squashTime) {
+            float t = squashElapsed / squashTime;
+            spriteScale.y = Mathf.Min(1, 1f - squashAmount * (1f - t));
+        }
+
+        float stretchElapsed = Time.timeSinceLevelLoad - stretchStartTime;
+        if (stretchElapsed < stretchTime) {
+            float t = stretchElapsed / stretchTime;
+            spriteScale.x = Mathf.Min(1, 1f - stretchAmount * (1f - t));
+        }
+
+        spriteObj.localScale = spriteScale;
     }
 
     // This is an absolute mess. If I had more time, I'd want to simplify as much as possible.
@@ -132,6 +153,7 @@ public class CharController : MonoBehaviour
                 }
                 rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
                 jumpStartTime = Time.timeSinceLevelLoad;
+                stretchStartTime = Time.timeSinceLevelLoad;
                 Instantiate(jumpEffectPrefab, transform.position, sr.flipX ? Quaternion.Euler(180, 0, 180) : Quaternion.Euler(0, 0, 0));
                 audioManager.PlayClip(audioManager.jumpClip);
             //} else if (walled != 0 && !grounded && jumpStartTime == 0 && newJumpInput) {
@@ -144,6 +166,7 @@ public class CharController : MonoBehaviour
                 rb.AddForce(Vector2.up * wallJumpYForce, ForceMode2D.Impulse);
                 rb.AddForce(Vector2.left * walled * wallJumpXForce, ForceMode2D.Impulse);
                 jumpStartTime = Time.timeSinceLevelLoad;
+                squashStartTime = Time.timeSinceLevelLoad;
                 Instantiate(jumpEffectPrefab, transform.position + Vector3.right * walled * col.bounds.extents.x, sr.flipX ? Quaternion.Euler(180, 0, -90) : Quaternion.Euler(0, 0, 90));
                 audioManager.PlayClip(audioManager.jumpClip);
             } else if (Time.timeSinceLevelLoad - jumpStartTime < jumpSustainTime) {
