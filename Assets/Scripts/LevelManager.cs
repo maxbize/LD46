@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
@@ -27,6 +28,7 @@ public class LevelManager : MonoBehaviour
     private Moveable nextPart; // Next part player needs to touch to advance Player level sequence
     private int hitsLeft;
     private float gameStartTime;
+    private bool releasedBoth;
 
     // Start is called before the first frame update
     void Start() {
@@ -54,6 +56,12 @@ public class LevelManager : MonoBehaviour
                 StartLevel(currentLevel);
             }
         } else if (endMenu.activeSelf) {
+            if (!releasedBoth) {
+                releasedBoth = !Input.GetKey(KeyCode.X) && !Input.GetKey(KeyCode.C);
+            } else if (Input.GetKey(KeyCode.X) && Input.GetKey(KeyCode.C)) {
+                Scene scene = SceneManager.GetActiveScene();
+                SceneManager.LoadScene(scene.name);
+            }
         } else {
             // Hack!
             if (player.position.y < 0.1f) {
@@ -119,10 +127,11 @@ public class LevelManager : MonoBehaviour
     }
 
     private void ActivateEndState() {
+        releasedBoth = false;
         endMenu.SetActive(true);
         heart.GetComponent<SpriteRenderer>().sortingLayerName = "Foreground";
         string time = (Time.timeSinceLevelLoad - gameStartTime).ToString("F1");
-        string s = "\nThanks for playing!\nTime: " + time + " sec\n\n@maxbize";
+        string s = "Thanks for playing!\nTime: " + time + " sec\nx + c to restart\n\n@maxbize";
         endMenuBody1.text = s;
         endMenuBody2.text = s;
     }
