@@ -15710,6 +15710,7 @@ GameObject:
   - component: {fileID: 576438349}
   - component: {fileID: 576438351}
   - component: {fileID: 576438352}
+  - component: {fileID: 576438353}
   m_Layer: 14
   m_Name: Boss Right Hand
   m_TagString: Untagged
@@ -15825,6 +15826,20 @@ MonoBehaviour:
   heart: {fileID: 0}
   heartParticles: {fileID: 0}
   audioManager: {fileID: 1225371653}
+--- !u!114 &576438353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 576438348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f4e3cb1945d83c44ba644207dcc52d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numGhosts: 2
+  ghostDelay: 4
 --- !u!1 &580217206
 GameObject:
   m_ObjectHideFlags: 0
@@ -41318,6 +41333,7 @@ GameObject:
   - component: {fileID: 1961989494}
   - component: {fileID: 1961989493}
   - component: {fileID: 1961989496}
+  - component: {fileID: 1961989497}
   m_Layer: 14
   m_Name: Boss Left Hand
   m_TagString: Untagged
@@ -41390,10 +41406,10 @@ SpriteRenderer:
   m_SortingLayerID: 785946155
   m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: -6248741079362886434, guid: 0fc2d853a2079e14ba0a2a80cdc793f4,
+  m_Sprite: {fileID: 4935984790844978548, guid: 0fc2d853a2079e14ba0a2a80cdc793f4,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 1
+  m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 2, y: 2}
@@ -41433,6 +41449,20 @@ MonoBehaviour:
   heart: {fileID: 0}
   heartParticles: {fileID: 0}
   audioManager: {fileID: 1225371653}
+--- !u!114 &1961989497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1961989492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f4e3cb1945d83c44ba644207dcc52d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numGhosts: 2
+  ghostDelay: 4
 --- !u!1 &1986922617
 GameObject:
   m_ObjectHideFlags: 0
@@ -41618,7 +41648,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &2080882876
 SpriteRenderer:
   m_ObjectHideFlags: 0
