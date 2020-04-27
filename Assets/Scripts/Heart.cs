@@ -76,7 +76,7 @@ public class Heart : MonoBehaviour
         if (pulseTime > 1.5f) {
             lastPulseTime = Time.timeSinceLevelLoad;
             audioCounter = 0;
-            pp.SendPulse(transform.position); // heh heh :P
+            pp.SendPulse(transform.position, 50f); // heh heh :P
             audioManager.PlayClip(audioManager.heartbeat);
         } else if (pulseTime > 0.2f && audioCounter == 0) {
             audioManager.PlayClip(audioManager.heartbeat);

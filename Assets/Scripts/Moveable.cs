@@ -225,7 +225,7 @@ public class Moveable : MonoBehaviour
     }
 
     // Debugging
-    private void OnDrawGizmos() {
-        UnityEditor.Handles.Label(transform.position + Vector3.left * 1.5f, state.ToString());
-    }
+    //private void OnDrawGizmos() {
+    //    UnityEditor.Handles.Label(transform.position + Vector3.left * 1.5f, state.ToString());
+    //}
 }

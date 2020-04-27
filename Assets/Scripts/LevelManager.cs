@@ -23,6 +23,7 @@ public class LevelManager : MonoBehaviour
     public Brain brainScript;
     public AudioSource songSource;
     public AudioManager audioManager;
+    public PostProcessing pp;
 
     private List<Moveable> parts;
     private Moveable nextPart; // Next part player needs to touch to advance Player level sequence
@@ -95,11 +96,6 @@ public class LevelManager : MonoBehaviour
     }
 
     public void NotifyPlayerTouchedPart(Moveable part) {
-        /*if (parts.Any(p => !p.atTarget)) {
-            return;
-        }*/
-
-
         if (part == nextPart) {
             if (nextPart.OtherCanMoveToNextPlayerSpot()) {
                 nextPart = nextPart == leftHand ? rightHand : leftHand;
@@ -114,8 +110,9 @@ public class LevelManager : MonoBehaviour
             brainScript.NotifyHurt();
             hitsLeft--;
             if (hitsLeft <= 0) {
+                pp.SendPulse(brain.GetComponent<Collider2D>().bounds.center, 200f);
                 Vector3 brainToPlayer = player.position - brain.transform.position;
-                player.GetComponent<Rigidbody2D>().velocity = brainToPlayer.normalized * 10;
+                player.GetComponent<CharController>().ForceJump(brainToPlayer.normalized);
                 currentLevel++;
                 if (currentLevel < levels.childCount) {
                     StartLevel(currentLevel);
@@ -136,4 +133,7 @@ public class LevelManager : MonoBehaviour
         endMenuBody2.text = s;
     }
 
+    public bool InMenus() {
+        return startMenu.activeSelf || endMenu.activeSelf;
+    }
 }

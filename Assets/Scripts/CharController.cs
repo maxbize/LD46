@@ -6,6 +6,7 @@ public class CharController : MonoBehaviour
 {
     // Set in editor
     public LevelManager levelManager;
+    public PostProcessing pp;
     public float acceleration;
     public float coyoteTime; // Only for grounded jumps
     public float jumpBufferTime; // How long to count a jump input as "down/new"
@@ -35,6 +36,8 @@ public class CharController : MonoBehaviour
     public float squashAmount;
     public float stretchTime;
     public float stretchAmount;
+    public float knockbackTime;
+    public float knockbackForce;
 
     private Rigidbody2D rb;
     private Collider2D col;
@@ -51,6 +54,7 @@ public class CharController : MonoBehaviour
     private float lastNewJumpInputTime;
     private float squashStartTime;
     private float stretchStartTime;
+    private float noControlStartTime;
 
     private enum JumpState
     {
@@ -65,11 +69,12 @@ public class CharController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         sr = GetComponentInChildren<SpriteRenderer>();
+        noControlStartTime = -100f; // Make sure the player has control from the start
     }
 
     // Update is called once per frame
     void Update() {
-        Vector3 spriteScale = spriteObj.localScale;
+        Vector3 spriteScale = Vector3.one;
 
         float squashElapsed = Time.timeSinceLevelLoad - squashStartTime;
         if (squashElapsed < squashTime) {
@@ -89,6 +94,16 @@ public class CharController : MonoBehaviour
     // This is an absolute mess. If I had more time, I'd want to simplify as much as possible.
     // Maybe just a single moveState powering a state machine and a single stateStart timer
     private void FixedUpdate() {
+        if (levelManager.InMenus()) {
+            return;
+        } else if (Time.timeSinceLevelLoad - noControlStartTime < knockbackTime) {
+            if (!wallSlideParticles.isPlaying) {
+                wallSlideParticles.Play();
+                wallSlideParticles.transform.localPosition = new Vector3(sr.flipX ? -0.3f : 0.2f, 0, -0.2f);
+            }
+            return;
+        }
+
         Vector2 force = Vector2.zero;
         bool grounded = IsGrounded();
         int walled = IsWalled();
@@ -107,6 +122,9 @@ public class CharController : MonoBehaviour
             attackStartTime = Time.timeSinceLevelLoad;
             attackTime = Time.timeSinceLevelLoad - attackStartTime;
             CheckAttackedBrain();
+            if (noControlStartTime == Time.timeSinceLevelLoad) {
+                return; // We just got knocked back from an attack
+            }
         }
         if (attackTime < attackAnimTime && sr.sprite != frame_Attack) {
             sr.sprite = frame_Attack;
@@ -249,11 +267,12 @@ public class CharController : MonoBehaviour
     private void CheckAttackedBrain() {
         int layerMask = 1 << LayerMask.NameToLayer("Environment");
         RaycastHit2D hit = Physics2D.Raycast(col.bounds.center, Vector2.right * (sr.flipX ? -1 : 1), 1.75f, layerMask);
-
+        Debug.DrawRay(col.bounds.center, Vector2.right * (sr.flipX ? -1 : 1) * 1.75f, Color.white, 1f);
         if (hit.collider != null) {
             Moveable m = hit.transform.GetComponent<Moveable>();
             if (m != null && m.config.part == MoveConfig.Part.Brain) {
                 levelManager.NotifyPlayerAttackedPart(m);
+                pp.SendPulse(hit.point, 10f);
             } else {
                 audioManager.PlayClip(audioManager.attackMiss);
             }
@@ -296,5 +315,12 @@ public class CharController : MonoBehaviour
         if (jumpDown) {
             lastNewJumpInputTime = Time.timeSinceLevelLoad;
         }
+    }
+
+    public void ForceJump(Vector2 dir) {
+        noControlStartTime = Time.timeSinceLevelLoad;
+        rb.AddForce(dir * knockbackForce, ForceMode2D.Impulse);
+        squashStartTime = Time.timeSinceLevelLoad;
+        audioManager.PlayClip(audioManager.jumpClip);
     }
 }

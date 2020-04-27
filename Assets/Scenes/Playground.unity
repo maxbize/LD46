@@ -29471,6 +29471,7 @@ MonoBehaviour:
   brainScript: {fileID: 852985680}
   songSource: {fileID: 1157716572}
   audioManager: {fileID: 1225371653}
+  pp: {fileID: 519420033}
 --- !u!4 &1157716571
 Transform:
   m_ObjectHideFlags: 0
@@ -40629,23 +40630,38 @@ PrefabInstance:
     - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
         type: 3}
       propertyPath: squashTime
-      value: 1
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
         type: 3}
       propertyPath: squashAmount
-      value: 1
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
         type: 3}
       propertyPath: stretchTime
-      value: 1
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
         type: 3}
       propertyPath: stretchAmount
-      value: 1
+      value: 0.8
       objectReference: {fileID: 0}
+    - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
+        type: 3}
+      propertyPath: knockbackTime
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
+        type: 3}
+      propertyPath: knockbackForce
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3674948573971586813, guid: 470191cb3bdb3e640a81935cd0a2e3e4,
+        type: 3}
+      propertyPath: pp
+      value: 
+      objectReference: {fileID: 519420033}
     m_RemovedComponents:
     - {fileID: 3674948573971586753, guid: 470191cb3bdb3e640a81935cd0a2e3e4, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 470191cb3bdb3e640a81935cd0a2e3e4, type: 3}
