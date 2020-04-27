@@ -10,6 +10,7 @@ public class Moveable : MonoBehaviour
     public Transform heart;
     public ParticleSystem heartParticles;
     public AudioManager audioManager;
+    public CameraManager cameraManager;
 
     public MoveConfig config { get; set; }
     public bool atTarget { get; set; }
@@ -162,14 +163,16 @@ public class Moveable : MonoBehaviour
             atTarget = false;
             targetIndex = 0;
             SwitchToState(State.MoveToInitialTarget);
-            if (config.part == MoveConfig.Part.LeftHand) {
+            if (config.part == MoveConfig.Part.LeftHand && state != State.MoveToInitialTarget) {
                 audioManager.PlayClip(audioManager.handReset);
             }
         }
     }
 
     private void SwitchToState(State state) {
+        State lastState = this.state;
         this.state = state;
+
         stateStartTime = Time.timeSinceLevelLoad;
 
         if (state == State.WaitingToStart) {
@@ -183,6 +186,8 @@ public class Moveable : MonoBehaviour
                 audioManager.PlayClip(audioManager.handPatrolShake);
             } else if (state == State.PatrolMoveTo) {
                 audioManager.PlayClip(audioManager.handPatrolMove);
+            } else if (state == State.PatrolWaitEnd) {
+                cameraManager.AddScreenShake(0.3f);
             }
         }
 
@@ -196,6 +201,8 @@ public class Moveable : MonoBehaviour
             startPointPlayerTo = transform.position;
 
             audioManager.PlayClip(audioManager.handPatrolMove);
+        } else if (state == State.PlayerWait && lastState == State.PlayerMoveTo) {
+            cameraManager.AddScreenShake(0.3f);
         }
 
         if (state == State.MoveToInitialTarget && config.part == MoveConfig.Part.Brain) {
