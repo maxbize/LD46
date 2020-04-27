@@ -10,6 +10,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip headMove;
     public AudioClip handPatrolShake;
     public AudioClip handPatrolMove;
+    public AudioClip handPatrolArrive;
     public AudioClip handReset;
     public AudioClip heartbeat;
     public AudioClip attackMiss;

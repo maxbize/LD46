@@ -187,6 +187,7 @@ public class Moveable : MonoBehaviour
             } else if (state == State.PatrolMoveTo) {
                 audioManager.PlayClip(audioManager.handPatrolMove);
             } else if (state == State.PatrolWaitEnd) {
+                audioManager.PlayClip(audioManager.handPatrolArrive);
                 cameraManager.AddScreenShake(0.3f);
             }
         }
